@@ -1,0 +1,31 @@
+<style>
+body {
+    font: 1.5em sans-serif;
+    margin: auto;
+    max-width: 35em;
+}
+video {
+    width: 49%;
+    display: inline;
+}
+</style>
+<article>
+
+<h2>Ridge vs lasso</h2>
+
+<h3>Ридж/ridge</h3>
+<div>
+<video autoplay loop><source src="./assets/ml/ridge.webm" type="video/webm" style="width: 35em;"></video>
+</div>
+<p>Точка пересечения сохраняет угол по отношению к началу координат.
+(В случае эллипсов это не так, но пока проигнорируем это.)</p>
+
+<h3>Лассо (lasso)</h3>
+<div style="flex: 1 1;">
+<video autoplay loop><source src="./assets/ml/lasso.webm" type="video/webm"></video>
+<video autoplay loop><source src="./assets/ml/lasso_next.webm" type="video/webm"></video>
+</div>
+<p>Точка пересечения перемещается к углу при уменьшении ромба, находясь на перпендикуляре к его стороне. При дальнейшем уменьшении ромба точка остается на углу.
+Так лассо зануляет признаки.</p>
+
+</article> 
