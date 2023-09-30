@@ -1,0 +1,29 @@
+Python
+
+Установка pip:
+
+    sudo apt install python3-pip
+
+Если проблемы с установкой какого-либо модуля:
+
+    python3 -m pip install --upgrade pip
+
+Установка модуля sklearn:
+
+    python3 -m pip install scikit-learn
+
+Горизонтальный скролинг ячейки в Jupyter
+=======================================
+
+Создай ячейку с таким содержимым:
+
+    %%html
+    <style>
+    div.jp-OutputArea-output > div {
+        overflow: scroll;
+        max-height: 20em;
+    }
+    </style>
+
+Очисти вывод для прекращения действия.
+Конкретное название класса `jp-OutputArea-output` можно выяснить с помощью инструментов разработчика в браузере.
