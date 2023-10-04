@@ -54,7 +54,7 @@ def processLine(line):
 def print_html():
     blocks = read_blocks()
     print('<!DOCTYPE html>')
-    print('<html>')
+    print('<html lang="ru">')
     print('<head>')
     print('<meta charset="utf-8">')
     print('<meta name="viewport" content="width=device-width, initial-scale=1">')

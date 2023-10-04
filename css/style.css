@@ -14,6 +14,10 @@ body {
     background-color: var(--background-color);
 }
 
+p {
+    hyphens: auto;
+}
+
 a {
     color: var(--link-color);
 }
