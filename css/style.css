@@ -1,0 +1,61 @@
+html {
+    --foreground-color: #fff;
+    --background-color: #222;
+    --link-color: #0ff;
+}
+
+body {
+    margin: 0 auto;
+    padding: 3em 1%;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    max-width: 30em;
+    line-height: 1.6em;
+    color: var(--foreground-color);
+    background-color: var(--background-color);
+}
+
+a {
+    color: var(--link-color);
+}
+
+pre code {
+    border: 1px solid black;
+    display: block;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.6em;
+}
+
+h2 {
+    font-size: 1.2em;
+}
+
+h3 {
+    font-size: 1em;
+}
+
+code {
+    font-family: monospace, monospace;
+}
+
+svg {
+    max-width: 100%;
+    display: block;
+    margin: 0 auto;
+}
+
+rect, circle, line, polyline, polygon, path {
+    stroke-width: 0.05;
+    stroke: var(--foreground-color);
+    fill: var(--foreground-color);
+    fill-opacity: 0;
+}
+
+.dashed {
+    stroke-dasharray: 0.05;
+}

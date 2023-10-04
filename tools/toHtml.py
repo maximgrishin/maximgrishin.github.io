@@ -58,8 +58,7 @@ def print_html():
     print('<head>')
     print('<meta charset="utf-8">')
     print('<meta name="viewport" content="width=device-width, initial-scale=1">')
-    print('<link rel="stylesheet" href="css/column.css">')
-    print('<link rel="stylesheet" href="css/post.css">')
+    print('<link rel="stylesheet" href="css/style.css">')
 
     print('<link rel="stylesheet" href="katex/katex.min.css">')
     print('<script src="katex/katex.min.js"></script>')
