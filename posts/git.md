@@ -1,0 +1,19 @@
+Просмотр содержимого объектов git
+
+Создать и запустить скрипт в папке `.git/objects`:
+
+    import os
+    import sys
+    import zlib
+    
+    for name in set(os.listdir()) - {sys.argv[0], 'info', 'pack'}:
+        for name2 in os.listdir(name):
+            h = name + name2
+            print(h, ':')
+            path = os.path.join(name, name2)
+            if os.path.getsize(path) > 100:
+                print('<big file>')
+            else:
+                with open(path, 'rb') as f:
+                    print(zlib.decompress(f.read()))
+            print()

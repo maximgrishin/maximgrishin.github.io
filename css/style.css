@@ -19,6 +19,7 @@ a {
 }
 
 pre code {
+    white-space: pre-wrap;
     border: 1px solid black;
     display: block;
     border-radius: 5px;
