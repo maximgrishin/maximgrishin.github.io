@@ -37,10 +37,12 @@ jobs:
           python-version: '3.x'
       - name: Build with Python
         run: python build.py
+      - name: Remove source directories
+        run: rm -rf posts
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'site'
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
