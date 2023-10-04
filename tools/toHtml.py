@@ -23,8 +23,13 @@ def escape(text):
         .replace('>', '&gt;'))
 
 
-def texToHtml(text):
-    return subprocess.run(['node', os.path.join('tools', 'texToHtml.js')],
+def runHightlight(text):
+    return subprocess.run(['node', os.path.join('tools', 'runHighlight.js')],
+        input=text.encode(), capture_output = True).stdout.decode()
+
+
+def runKatex(text):
+    return subprocess.run(['node', os.path.join('tools', 'runKatex.js')],
         input=text.encode(), capture_output = True).stdout.decode()
 
 
@@ -36,7 +41,7 @@ def processLine(line):
         '': lambda text : text.replace('--', '—'),
         '*': lambda text : '<em>' + escape(text) + '</em>',
         '`': lambda text : '<code>' + escape(text) + '</code>',
-        '$': texToHtml,
+        '$': runKatex,
     }
     for char in line:
         if char in toHtml:
@@ -60,6 +65,7 @@ def processBlocks(blocks):
     result += '<meta name="viewport" content="width=device-width, initial-scale=1">'
     result += '<link rel="stylesheet" href="css/style.css">'
     result += '<link rel="stylesheet" href="css/katex.min.css">'
+    result += '<link rel="stylesheet" href="css/stackoverflow-dark.min.css">'
     result += '<title>' + blocks[0][0] + '</title>'
     result += '</head>'
     result += '<body>'
@@ -68,7 +74,7 @@ def processBlocks(blocks):
         if all(line.startswith(' ' * 4) for line in block):
             html = (
                 '<pre><code>' +
-                '\n'.join(escape(line[4:]) for line in block) +
+                runHightlight('\n'.join(line[4:] for line in block)) +
                 '</code></pre>'
             )
         elif len(block) == 2 and block[1] == '=' * len(block[0]):
