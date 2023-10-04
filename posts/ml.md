@@ -3,7 +3,7 @@ Ridge vs lasso
 Ридж/ridge
 ==========
 
-<svg viewBox="-3 -6 7 9" width="50%">
+<svg viewBox="-3 -6 7 9" width="15em">
 <line x1="-10" x2="10" y1="0" y2="0" />
 <line x1="0" x2="0" y1="-10" y2="10" />
 <circle cx="0" cy="0" r="0.05" class="filled" />
@@ -39,7 +39,7 @@ repeatCount="indefinite">
 Лассо/lasso
 ===========
 
-<svg viewBox="-3 -6 7 9" width="50%">
+<svg viewBox="-3 -6 7 9" width="15em">
 <line x1="-10" x2="10" y1="0" y2="0" />
 <line x1="0" x2="0" y1="-10" y2="10" />
 <circle cx="0" cy="0" r="0.05" class="filled" />
