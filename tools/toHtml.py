@@ -85,15 +85,10 @@ def print_html():
             html = (
                 '<h3>' + processLine(block[0]) + '</h3>'
             )
-        elif block[0].startswith(': '):
-            if (block[0].endswith('.jpeg') or
-                block[0].endswith('.png') or
-                block[0].endswith('.svg')):
-                html = '<img src="assets/' + block[0][2:] + '" />'
-            elif block[0].endswith('.webm'):
-                html = '<video autoplay loop><source src="./assets/' + block[0][2:] + '" type="video/webm" /></video>'
-            else:
-                raise ValueError('Unknown asset type')
+        elif block[0].startswith('<svg'):
+            html = (
+                '\n'.join(block)
+            )
         else:
             html = (
                 '<p>' +

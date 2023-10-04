@@ -4,7 +4,6 @@ import shutil
 import subprocess
 
 
-shutil.copytree('assets', 'site/assets', dirs_exist_ok=True)
 shutil.copytree('css', 'site/css', dirs_exist_ok=True)
 shutil.copytree('katex', 'site/katex', dirs_exist_ok=True)
 

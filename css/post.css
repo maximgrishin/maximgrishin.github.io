@@ -13,9 +13,19 @@ code {
     font-family: monospace, monospace;
 }
 
-video, img {
+svg {
     max-width: 100%;
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+rect, circle, line, polyline, polygon, circle, path {
+    stroke-width: 0.05;
+    stroke: black;
+    fill-opacity: 0;
+}
+
+.dashed {
+    stroke-dasharray: 0.05;
 }
