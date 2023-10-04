@@ -34,7 +34,7 @@ jobs:
       - name: Build with Python
         run: python build.py
       - name: Remove source code
-        run: rm -rf posts tools build.py
+        run: rm -rf posts tools build.py .github .git .gitignore
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
