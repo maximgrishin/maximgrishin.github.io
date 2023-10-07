@@ -3,7 +3,7 @@ Ridge vs lasso
 Ридж/ridge
 ==========
 
-<svg viewBox="-3 -6 7 9" width="15em">
+<svg viewBox="-3 -6 7 9" width="15em" max-width="100%" fill="none" stroke-width="0.05" stroke="currentcolor">
 <line x1="-10" x2="10" y1="0" y2="0" />
 <line x1="0" x2="0" y1="-10" y2="10" />
 <circle cx="0" cy="0" r="0.05" class="filled" />
@@ -39,7 +39,7 @@ repeatCount="indefinite">
 Лассо/lasso
 ===========
 
-<svg viewBox="-3 -6 7 9" width="15em">
+<svg viewBox="-3 -6 7 9" max-width="100%" width="15em" fill="none" stroke-width="0.05" stroke="currentcolor">
 <line x1="-10" x2="10" y1="0" y2="0" />
 <line x1="0" x2="0" y1="-10" y2="10" />
 <circle cx="0" cy="0" r="0.05" class="filled" />
@@ -70,7 +70,7 @@ values="
 dur="5s"
 repeatCount="indefinite" />
 </circle>
-<line class="dashed" x1="-10" y1="8" x2="8" y2="-10"  />
+<line class="dashed" x1="-10" y1="8" x2="8" y2="-10" />
 </svg>
 
 Точка пересечения перемещается к углу при уменьшении ромба, находясь на перпендикуляре к его стороне.
