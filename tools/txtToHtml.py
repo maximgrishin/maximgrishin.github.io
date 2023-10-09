@@ -23,17 +23,8 @@ def escape(text):
 
 
 def processBlocks(blocks):
-    result = '<!DOCTYPE html>'
-    result += '<html lang="ru">'
-    result += '<head>'
-    result += '<meta charset="utf-8">'
-    result += '<meta name="viewport" content="width=device-width, initial-scale=1">'
-    result += '<link rel="stylesheet" href="default.css">'
-    result += '<title>' + blocks[0][0] + '</title>'
-    result += '</head>'
-    result += '<body>'
-    result += '<h1>' + blocks[0][0] + '</h1>'
-    for block in blocks[1:]:
+    result = ''
+    for block in blocks:
         if all(line.startswith(' ' * 4) for line in block):
             html = (
                 '<pre><code>' +
@@ -56,8 +47,6 @@ def processBlocks(blocks):
         else:
             raise ValueError('Bad block', block)
         result += html
-    result += '</body>'
-    result += '</html>'
     return result
 
 

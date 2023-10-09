@@ -22,12 +22,43 @@ shutil.copyfile(
 )
 
 for txtname in glob.glob(os.path.join('posts', '*')):
-    htmlname = os.path.splitext(os.path.basename(txtname))[0] + '.html'
+    filename = os.path.splitext(os.path.basename(txtname))[0]
+    htmlname = filename + '.html'
     with open(txtname) as source:
         with open(os.path.join('site', htmlname), 'w') as html:
+            result = '<!DOCTYPE html>'
+            result += '<html lang="ru">'
+            result += '<head>'
+            result += '<meta charset="utf-8">'
+            result += '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            result += '<link rel="stylesheet" href="/default.css">'
+            result += '</head>'
+            result += '<body>'
+            html.write(result)
+            html.flush()
             subprocess.run(['python3', os.path.join(currentDirectory, 'txtToHtml.py')],
                 stdin=source, stdout=html)
+            result = '</body>'
+            result += '</html>'
+            html.write(result)
 
-with open(os.path.join('site', 'index.html'), 'wb') as index:
-    subprocess.run(['python3', os.path.join(currentDirectory, 'makeIndex.py')],
-        stdout=index)
+with open(os.path.join('site', 'index.html'), 'w') as index:
+    result = '<!DOCTYPE html>'
+    result += '<html lang="ru">'
+    result += '<head>'
+    result += '<meta charset="utf-8">'
+    result += '<meta name="viewport" content="width=device-width, initial-scale=1">'
+    result += '<link rel="stylesheet" href="/default.css">'
+    result += '</head>'
+    result += '<body>'
+    headers = []
+    for fullname in glob.glob(os.path.join('posts', '*')):
+        with open(fullname) as html:
+            fileHeaders = subprocess.run(['python3', os.path.join(currentDirectory, 'getHeaders.py')],
+                stdin=html, capture_output=True).stdout.decode()
+        headers.append((os.path.splitext(os.path.basename(fullname))[0], fileHeaders))
+    for header in reversed(sorted(headers)):
+        result += '<p><a href="/' + header[0] + '.html">' + header[0] + ' | ' + ' | '.join(header[1].splitlines()[:-1]) + '</a></p>'
+    result += '</body>'
+    result += '</html>'
+    index.write(result)
