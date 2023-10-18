@@ -24,7 +24,7 @@ h2, p, pre {
     word-wrap: break-word;
 }
 
-h2 {
+* + h2 {
     margin-top: calc(3 * var(--line-height));
 }
 
