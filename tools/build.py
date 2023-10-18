@@ -58,7 +58,7 @@ with open(os.path.join('site', 'index.html'), 'w') as index:
                 stdin=html, capture_output=True).stdout.decode()
         headers.append((os.path.splitext(os.path.basename(fullname))[0], fileHeaders))
     for header in reversed(sorted(headers)):
-        result += '<p><a href="/' + header[0] + '.html">' + header[0] + ' | ' + ' | '.join(header[1].splitlines()[:-1]) + '</a></p>'
+        result += '<p><a href="/' + header[0] + '.html">' + ' | '.join(header[1].splitlines()) + '</a></p>'
     result += '</body>'
     result += '</html>'
     index.write(result)

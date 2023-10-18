@@ -17,18 +17,18 @@ a {
     color: #0ff;
 }
 
-h1, h2, h3, p, pre {
+h2, p, pre {
     margin: var(--line-height) 0;
     font-size: var(--font-size);
     line-height: var(--line-height);
-    white-space: pre-wrap;
     word-wrap: break-word;
 }
 
-h2::after, h3::after {
-    content: '\A' attr(after);
+h2 {
+    margin-top: calc(3 * var(--line-height));
 }
 
 pre {
     padding-left: 4ch;
+    white-space: pre-wrap;
 }
