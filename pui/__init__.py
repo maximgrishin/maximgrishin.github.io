@@ -32,17 +32,17 @@ def repaint():
 def update_btns(entered):
 	for b in range(len(btns)):
 		btns[b] = False
-	if "a" in entered:
+	if 'a' in entered or 'A' in entered:
 		btns[0] = True
-	if "d" in entered:
+	if 'd' in entered or 'D' in entered:
 		btns[1] = True
-	if "w" in entered:
+	if 'w' in entered or 'W' in entered:
 		btns[2] = True
-	if "s" in entered:
+	if 's' in entered or 'S' in entered:
 		btns[3] = True
-	if "c" in entered:
+	if 'c' in entered or 'C' in entered:
 		btns[4] = True
-	if "x" in entered:
+	if 'x' in entered or 'X' in entered:
 		btns[5] = True
 
 async def _main():
