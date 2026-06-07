@@ -40,9 +40,9 @@ def update_btns(entered):
 		btns[2] = True
 	if 's' in entered or 'S' in entered:
 		btns[3] = True
-	if 'c' in entered or 'C' in entered:
+	if 'p' in entered or 'P' in entered:
 		btns[4] = True
-	if 'x' in entered or 'X' in entered:
+	if 'o' in entered or 'O' in entered:
 		btns[5] = True
 
 async def _main():

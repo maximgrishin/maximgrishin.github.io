@@ -13,7 +13,7 @@ for (let i = 0; i < 16; ++i) {
 	document.body.appendChild(document.createElement("br"));
 }
 help = document.createElement("p");
-help.textContent = 'controls: WASD, X, C';
+help.textContent = 'controls: WASD, O, P';
 document.body.appendChild(help);
 const inp = document.createElement("input");
 document.body.appendChild(inp);

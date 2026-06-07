@@ -41,7 +41,7 @@ def run(update, main):
 	_step = update
 	try:
 		print(HIDE_CURSOR+ALT_SCREEN, end='', flush=True)
-		print(GO_TO(16, 0) + 'controls: WASD, X, C')
+		print(GO_TO(16, 0) + 'controls: WASD, O, P')
 		asyncio.run(main())
 	except KeyboardInterrupt:
 		pass
