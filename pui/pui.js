@@ -16,6 +16,7 @@ help = document.createElement("p");
 help.textContent = 'controls: WASD, O, P';
 document.body.appendChild(help);
 const inp = document.createElement("input");
+inp.style = "position:absolute;top:-1000px;";
 document.body.appendChild(inp);
 cells[7][12].textContent = 'loading';
 for (let i = 13; i < 19; ++i) {
@@ -51,3 +52,7 @@ function read_entered() {
 	inp.value = '';
 	return entered;
 }
+
+document.addEventListener("click", () => {
+	inp.focus();
+});
