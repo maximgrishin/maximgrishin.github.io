@@ -1,28 +1,3 @@
-document.body.style = 'font-family: monospace';
-
-let cells = Array()
-for (let i = 0; i < 16; ++i) {
-	let row = Array();
-	for (let j = 0; j < 32; ++j) {
-		cell = document.createElement("span");
-		cell.innerHTML = '.';
-		row.push(cell);
-		document.body.appendChild(cell);
-	}
-	cells.push(row);
-	document.body.appendChild(document.createElement("br"));
-}
-help = document.createElement("p");
-help.textContent = 'controls: WASD, O, P';
-document.body.appendChild(help);
-const inp = document.createElement("input");
-inp.style = "position:absolute;top:-1000px;";
-document.body.appendChild(inp);
-cells[7][12].textContent = 'loading';
-for (let i = 13; i < 19; ++i) {
-	cells[7][i].textContent = '';
-}
-
 PICO8_COLORS = [
 	'0 0 0',       // black
 	'29 43 83',    // dark_blue
@@ -41,6 +16,49 @@ PICO8_COLORS = [
 	'255 119 168', // pink
 	'255 204 170', // peach
 ];
+
+const canvas = document.createElement("canvas");
+const context = canvas.getContext("2d");
+context.font = "100px monospace";
+const metrics = context.measureText("1".repeat(33));
+let font_height = 100.*window.screen.width/metrics.width;
+if (window.screen.width > window.screen.height) {
+	font_height *= 0.75*window.screen.height/window.screen.width;
+}
+const font_width = (font_height/100)*metrics.width/33;
+
+document.body.style = "border:0;margin:0;font-size:"+font_height+"px;font-family:monospace;background-color:rgb("+PICO8_COLORS[0]+");color:rgb("+PICO8_COLORS[6]+");white-space:nowrap;";
+
+box = document.createElement("div");
+
+let cells = Array()
+for (let i = 0; i < 16; ++i) {
+	let row = Array();
+	for (let j = 0; j < 32; ++j) {
+		cell = document.createElement("span");
+		cell.style = "background-color:black";
+		cell.innerHTML = '\u00A0';
+		row.push(cell);
+		box.appendChild(cell);
+	}
+	cells.push(row);
+	box.appendChild(document.createElement("br"));
+}
+
+const left_offset = (window.screen.width-font_width*33)/2;
+document.body.appendChild(box);
+box.style="border:solid "+font_width/2+"px;border-color:rgb("+PICO8_COLORS[5]+");width:fit-content;white-space:nowrap;position:absolute;left:"+left_offset+"px;top:0;";
+help = document.createElement("p");
+help.textContent = 'controls: WASD, O, P';
+help.style = "position:absolute;top:"+font_height*20+"px;left:"+left_offset+"px;";
+document.body.appendChild(help);
+const inp = document.createElement("input");
+inp.style = "position:absolute;top:-1000px;left:"+left_offset+"px";
+document.body.appendChild(inp);
+cells[7][12].textContent = 'loading';
+for (let i = 13; i < 19; ++i) {
+	cells[7][i].textContent = '';
+}
 
 function cdraw(x,y,c,bg,fg) {
 	cells[y][x].textContent = c;
