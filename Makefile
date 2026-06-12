@@ -2,7 +2,7 @@ apps = demo
 
 all: build/index.js $(apps)
 
-build/index.js:
+build/index.js: index.js
 	mkdir -p build
 	cp index.js build
 

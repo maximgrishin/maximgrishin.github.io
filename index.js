@@ -55,27 +55,42 @@ const inp = document.createElement("input");
 inp.style = "position:absolute;top:-1000px;left:"+left_offset+"px";
 document.body.appendChild(inp);
 
-function cset(y, x, c, bg, fg) {
+function chset(y, x, c) {
 	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
 		return;
 	}
 	if (c == ' ') {
 		c = '\u00A0';
 	}
+	let bg = 0;
+	let fg = 7;
 	cells[y][x].textContent = c;
+}
+window.chset = chset;
+
+function bgset(y, x, bg) {
+	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
+		return;
+	}
 	if (0 <= bg && bg < 16) {
 		cells[y][x].style.background = 'rgb(' + PICO8_COLORS[bg] + ')'
+	}
+}
+window.bgset = bgset;
+function fgset(y, x, fg) {
+	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
+		return;
 	}
 	if (0 <= fg && fg < 16) {
 		cells[y][x].style.color = 'rgb(' + PICO8_COLORS[fg] + ')'
 	}
 }
-window.cset = cset;
+window.fgset = fgset;
 
 function cls() {
 	for (let i = 0; i < 16; ++i) {
 		for (let j = 0; j < 32; ++j) {
-			cset(i, j, ' ', 0, 7);
+			chset(i, j, ' ');
 		}
 	}
 }
