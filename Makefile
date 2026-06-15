@@ -11,9 +11,9 @@ $(app): build/$(app)/compiled.js build/$(app)/compiled.wasm
 endef
 
 define BUILD
-build/$(app)/compiled.js build/$(app)/compiled.wasm: $(app)/app.cpp js-library.cpp js-library.js index.html
+build/$(app)/compiled.js build/$(app)/compiled.wasm: $(app)/app.cpp ui.cpp ui.js index.html ui.hpp
 	mkdir -p build/$(app)
-	em++ js-library.cpp $(app)/app.cpp -o build/$(app)/compiled.js -s EXPORTED_FUNCTIONS="['cwrap']" --js-library js-library.js
+	em++ ui.cpp $(app)/app.cpp -o build/$(app)/compiled.js -s EXPORTED_FUNCTIONS="['cwrap']" --js-library ui.js
 	cp index.html build/$(app)/index.html
 endef
 

@@ -48,14 +48,13 @@ const left_offset = (window.screen.width-font_width*33)/2;
 document.body.appendChild(box);
 box.style="border:solid "+font_width/2+"px;border-color:rgb("+PICO8_COLORS[5]+");width:fit-content;white-space:nowrap;position:absolute;left:"+left_offset+"px;top:0;";
 const help = document.createElement("p");
-help.textContent = 'controls: WASD, O, P';
 help.style = "position:absolute;top:"+font_height*20+"px;left:"+left_offset+"px;";
 document.body.appendChild(help);
 const inp = document.createElement("input");
 inp.style = "position:absolute;top:-1000px;left:"+left_offset+"px";
 document.body.appendChild(inp);
 
-function chset(y, x, c) {
+function cset(y, x, c) {
 	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
 		return;
 	}
@@ -66,9 +65,9 @@ function chset(y, x, c) {
 	let fg = 7;
 	cells[y][x].textContent = c;
 }
-window.chset = chset;
+window.cset = cset;
 
-function bgset(y, x, bg) {
+function bset(y, x, bg) {
 	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
 		return;
 	}
@@ -76,8 +75,8 @@ function bgset(y, x, bg) {
 		cells[y][x].style.background = 'rgb(' + PICO8_COLORS[bg] + ')'
 	}
 }
-window.bgset = bgset;
-function fgset(y, x, fg) {
+window.bset = bset;
+function fset(y, x, fg) {
 	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
 		return;
 	}
@@ -85,31 +84,61 @@ function fgset(y, x, fg) {
 		cells[y][x].style.color = 'rgb(' + PICO8_COLORS[fg] + ')'
 	}
 }
-window.fgset = fgset;
+window.fset = fset;
 
 function cls() {
 	for (let i = 0; i < 16; ++i) {
 		for (let j = 0; j < 32; ++j) {
-			chset(i, j, ' ');
+			cset(i, j, ' ');
+			fset(i, j, 7);
+			bset(i, j, 0);
 		}
 	}
 }
 cls();
+for (let i = 0; i < 7; ++i) {
+	cset(5 + i, 10, '|');
+	fset(5 + i, 10, 1 + i);
+}
+for (let i = 0; i < 4; ++i) {
+	cset(5 + i, 13 + 3*i, '-');
+	fset(5 + i, 13 + 3*i, 8 + i);
+}
+for (let i = 0; i < 4; ++i) {
+	cset(11 - i, 13 + 3*i, '-');
+	fset(11 - i, 13 + 3*i, 14 - i);
+}
+cset(8, 13, 'P');
+fset(8, 13, 12);
+cset(8, 14, 'L');
+fset(8, 14, 13);
+cset(8, 15, 'A');
+fset(8, 15, 14);
+cset(8, 16, 'Y');
+fset(8, 16, 15);
+
+function print(y, x, msg) {
+	let i = 0;
+	for (c of msg) {
+		cset(y, x + i, c);
+		++i;
+	}
+}
 
 function btnp() {
 	if (inp.value != '') {
 		const head = inp.value[0];
 		inp.value = inp.value.slice(1);
-		if (head == 'w') {
+		if (head == 'w' || head == 'W') {
 			return 1;
 		}
-		if (head == 's') {
+		if (head == 's' || head == 'S') {
 			return 2;
 		}
-		if (head == 'a') {
+		if (head == 'a' || head == 'A') {
 			return 3;
 		}
-		if (head == 'd') {
+		if (head == 'd' || head == 'D') {
 			return 4;
 		}
 	}
@@ -117,28 +146,74 @@ function btnp() {
 }
 window.btnp = btnp;
 
+let runtime_initialized = false;
+window.started = false;
+
 document.addEventListener("click", () => {
+	if (!runtime_initialized) {
+		print(13,2,"failed to load C++ module :(");
+		print(14,2,"try refreshing the page");
+	}
+	if (window.started == false) {
+		cls();
+		frameCallback();
+		help.textContent += 'controls: WASD, O, P';
+		if (audioCtx.state === "suspended") {
+			audioCtx.resume();
+		}
+		for (let i = 0; i < 4; ++i) {
+			osc[i].start(audioCtx.currentTime);
+		}
+		window.started = true;
+	}
 	inp.focus();
 });
-//let skipped_frames = 0;
+
 function frameCallback() {
-//	if (skipped_frames >= 1) {
-		window.update();
-//		skipped_frames = 0;
-//	} else {
-//		++skipped_frames;
-//	}
+	window.update();
+	window.flip();
 	requestAnimationFrame(frameCallback);
 }
 
-let s = document.createElement("pre");
-document.body.appendChild(s);
-function f12(m) {
-	help.textContent += m + "\n";
+function log(m) {
+	help.textContent += m;
 }
-f12("hi");
+
 Module.onRuntimeInitialized = () => {
-	let update = Module.cwrap('call_update', null, []);
-	window.update = update;
-	frameCallback();
+	window.update = Module.cwrap('call_update', null, []);
+	window.flip = Module.cwrap('flip', null, []);
+	runtime_initialized = true;
 };
+
+const audioCtx = new AudioContext();
+const types = ["sine", "square", "triangle", "sawtooth"];
+const shares = [3/8, 1/8, 3/8, 1/8];
+let osc = [];
+let gain = [];
+for (let i = 0; i < 4; ++i) {
+	osc.push(new OscillatorNode(audioCtx, {
+	type: types[i],
+	frequency: 440,
+}));
+	gain.push(new GainNode(audioCtx, {"gain":0.0001}));
+	osc[i].connect(gain[i]).connect(audioCtx.destination);
+}
+
+function nset(ch, note) {
+	volume = Math.max(0, note);
+	volume = Math.min(127, note);
+	osc[ch].frequency.value = (440 * (2 ** ((note - 69) / 12)));
+}
+window.nset = nset;
+
+function vset(ch, volume) {
+	volume = Math.max(0, volume);
+	volume = Math.min(3, volume);
+	volume /= 3;
+	volume *= shares[ch];
+	if (volume == 0) {
+		volume = 0.0001;
+	}
+	gain[ch].gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
+}
+window.vset = vset;

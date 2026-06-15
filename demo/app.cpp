@@ -1,60 +1,47 @@
-#include "../lib.hpp"
+#include "../ui.hpp"
 
 #include <vector>
 
-std::vector<std::vector<char>> char_buffer(16, std::vector<char>(32, ' '));
-std::vector<std::vector<int>> bg_buffer(16, std::vector<int>(32, 0));
-std::vector<std::vector<int>> fg_buffer(16, std::vector<int>(32, 7));
+char y = 8;
+char x = 16;
 
-std::vector<std::vector<char>> char_buffer2(16, std::vector<char>(32, ' '));
-std::vector<std::vector<int>> bg_buffer2(16, std::vector<int>(32, 0));
-std::vector<std::vector<int>> fg_buffer2(16, std::vector<int>(32, 7));
+std::vector<char> xs{0,0,0,1,2,2,2,1};
+std::vector<char> ys{0,1,2,2,2,1,0,0};
+char i = 0;
+char ii = 0;
 
-void set(int i, int j, char c, int bg, int fg) {
-	//cset(i,j,c,bg,fg);
-	if (i < 0 || 16 <= i || j < 0 || 32 <= j) {
-		return;
-	}
-	char_buffer[i][j] = c;
-	bg_buffer[i][j] = bg;
-	fg_buffer[i][j] = fg;
-}
-
-void flip() {
-	for (int i = 0; i < 16; ++i) {
-		for (int j = 0; j < 32; ++j) {
-			chset(i, j, char_buffer[i][j]);
-			bgset(i, j, bg_buffer[i][j]);
-			fgset(i, j, fg_buffer[i][j]);
-		}
-	}
-}
-
-void cls() {
-	for (int i = 0; i < 16; ++i) {
-		for (int j = 0; j < 32; ++j) {
-			set(i, j, ' ', 0, 7);
-		}
-	}
-}
-
-int y = 8;
-int x = 16;
-
-std::vector<int> xs{0,0,0,1,2,2,2,1};
-std::vector<int> ys{0,1,2,2,2,1,0,0};
-int i = 0;
-
-int j = 0;
-int fy = 3;
-int explosion = 0;
+char j = 0;
+char fy = 3;
+char explosion = 0;
 
 extern "C" void update() {
-	cls();
-	set(ys[i], xs[i], 'U', 1, 8);
-	i += 1;
-	i %= 8;
-	while (int b = btnp()) {
+	if (y == 8 && 8 <= x && x <= 10) {
+		ui::sfx(ui::SINE, 60+x-8, ui::FORTE);
+		ui::sfx(ui::TRIANGLE, 64+x-8, ui::FORTE);
+	}
+	ui::cls();
+	ui::cset(8,8,' ',9,9);
+	ui::cset(8,9,' ',9,9);
+	ui::cset(8,10,' ',9,9);
+	bool in = x == 1 && y == 1;
+	ii += 1;
+	if (!in) {
+		if (ii >= 2) {
+			i += 1;
+			i %= 8;
+			ii = 0;
+		}
+	} else {
+		if (ii >= 8) {
+			i += 1;
+			i %= 8;
+			ii = 0;
+		}
+		std::vector<char> ns = {61,63,66,68,70,68,66,63};
+		ui::sfx(ui::SAWTOOTH, ns[i], ui::FORTE);
+	}
+	ui::cset(ys[i], xs[i], 'U', 8, 1);
+	while (char b = ui::btnp()) {
 		if (b == 1) {
 			y -= 1;
 		}
@@ -68,32 +55,34 @@ extern "C" void update() {
 			x += 1;
 		}
 	}
-	set(y, x, 'B', 2, 9);
-	if (explosion==0&&y == fy && x == j) {
+	if (explosion == 0 && y == fy && x == j) {
 		explosion = 1;
 	}
 	if (explosion == 0) {
 		++j;
 		j %= 32;
-		set(fy,j,'X', 0, 10);
+		ui::cset(fy, j, 'X', 10, 0);
 	} else {
 		if (explosion <= 4) {
-			set(fy,j+1,'/', 0, 10);
-			set(fy,j-1,'/', 0, 10);
-			set(fy+1,j,'.', 0, 10);
+			ui::cset(fy, j+1, '/', 10, 0);
+			ui::cset(fy, j-1, '/', 10, 0);
+			ui::cset(fy+1, j, '.', 10, 0);
 				++explosion;
+			ui::sfx(ui::SQUARE, 84, ui::FORTE);
 			}
 		else if (explosion <= 8) {
-			set(fy,j+2,'-', 0, 10);
-			set(fy,j-2,'/', 0, 10);
-			set(fy+2,j+1,'|', 0, 10);
+			ui::cset(fy, j+2, '-', 10, 0);
+			ui::cset(fy, j-2, '/', 10, 0);
+			ui::cset(fy+2,j+1,'|', 10, 0);
 				++explosion;
+			ui::sfx(ui::SQUARE, 82, ui::FORTE);
 			}
 		else if (explosion <= 12) {
-			set(fy-2,j+2,'/', 0, 10);
-			set(fy,j-3,'.', 0, 10);
-			set(fy+3,j+1,'.', 0, 10);
+			ui::cset(fy-2,j+2,'/', 10, 0);
+			ui::cset(fy, j-3, '.', 10, 0);
+			ui::cset(fy+3,j+1,'.', 10, 0);
 				++explosion;
+			ui::sfx(ui::SQUARE, 80, ui::FORTE);
 			}
 		else {
 			j = 0;
@@ -102,5 +91,5 @@ extern "C" void update() {
 			explosion = 0;
 		}
 	}
-	flip();
+	ui::cset(y, x, 'B', ui::BLUE, ui::GREEN);
 }
