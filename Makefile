@@ -7,13 +7,13 @@ build/index.js: index.js
 	cp index.js build
 
 define GROUP
-$(app): build/$(app)/compiled.js build/$(app)/compiled.wasm
+$(app): build/$(app)/compiled.wasm
 endef
 
 define BUILD
-build/$(app)/compiled.js build/$(app)/compiled.wasm: $(app)/app.cpp ui.cpp ui.js index.html ui.hpp
+build/$(app)/compiled.wasm: $(app)/app.cpp ui.cpp index.html ui.hpp
 	mkdir -p build/$(app)
-	em++ ui.cpp $(app)/app.cpp -o build/$(app)/compiled.js -s EXPORTED_FUNCTIONS="['cwrap']" --js-library ui.js
+	clang++ --target=wasm32 -nostdlib -Wl,--no-entry ui.cpp $(app)/app.cpp -o build/$(app)/compiled.wasm
 	cp index.html build/$(app)/index.html
 endef
 

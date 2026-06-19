@@ -58,6 +58,9 @@ function cset(y, x, c) {
 	if (y < 0 || 16 <= y || x < 0 || 32 <= x) {
 		return;
 	}
+	if (typeof(c) == typeof(0)) {
+		c = String.fromCharCode(c);
+	}
 	if (c == ' ') {
 		c = '\u00A0';
 	}
@@ -179,12 +182,6 @@ function log(m) {
 	help.textContent += m;
 }
 
-Module.onRuntimeInitialized = () => {
-	window.update = Module.cwrap('call_update', null, []);
-	window.flip = Module.cwrap('flip', null, []);
-	runtime_initialized = true;
-};
-
 const audioCtx = new AudioContext();
 const types = ["sine", "square", "triangle", "sawtooth"];
 const shares = [3/8, 1/8, 3/8, 1/8];
@@ -217,3 +214,10 @@ function vset(ch, volume) {
 	gain[ch].gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
 }
 window.vset = vset;
+
+const importObject = {env:{cset,bset,fset,btnp,nset,vset}};
+WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
+	window.update = obj.instance.exports.call_update;
+	window.flip = obj.instance.exports.flip;
+	runtime_initialized = true;
+});

@@ -34,9 +34,9 @@ enum {
 	FORTE,
 };
 
-void cset(char y, char x, char character, char foreground = COLORS, char background = COLORS);
+void cset(int y, int x, int character, int foreground = COLORS, int background = COLORS);
 void cls();
-char btnp();
-void sfx(char channel, char note, char volume);
+int btnp();
+void sfx(int channel, int note, int volume);
 
 } // namespace ui

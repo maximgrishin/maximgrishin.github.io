@@ -1,18 +1,16 @@
 #include "../ui.hpp"
 
-#include <vector>
+int y = 8;
+int x = 16;
 
-char y = 8;
-char x = 16;
+int xs[] {0,0,0,1,2,2,2,1};
+int ys[] {0,1,2,2,2,1,0,0};
+int i = 0;
+int ii = 0;
 
-std::vector<char> xs{0,0,0,1,2,2,2,1};
-std::vector<char> ys{0,1,2,2,2,1,0,0};
-char i = 0;
-char ii = 0;
-
-char j = 0;
-char fy = 3;
-char explosion = 0;
+int j = 0;
+int fy = 3;
+int explosion = 0;
 
 extern "C" void update() {
 	if (y == 8 && 8 <= x && x <= 10) {
@@ -37,11 +35,11 @@ extern "C" void update() {
 			i %= 8;
 			ii = 0;
 		}
-		std::vector<char> ns = {61,63,66,68,70,68,66,63};
+		int ns[] {61,63,66,68,70,68,66,63};
 		ui::sfx(ui::SAWTOOTH, ns[i], ui::FORTE);
 	}
 	ui::cset(ys[i], xs[i], 'U', 8, 1);
-	while (char b = ui::btnp()) {
+	while (int b = ui::btnp()) {
 		if (b == 1) {
 			y -= 1;
 		}
@@ -53,6 +51,7 @@ extern "C" void update() {
 		}
 		if (b == 4) {
 			x += 1;
+			++i;
 		}
 	}
 	if (explosion == 0 && y == fy && x == j) {

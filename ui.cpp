@@ -1,72 +1,90 @@
 #include "ui.hpp"
 
-#include <emscripten.h>
+__attribute__((import_name("cset")))
+extern "C"
+void cset(int y, int x, int c);
 
-#include <array>
+__attribute__((import_name("bset")))
+extern "C"
+void bset(int y, int x, int b);
 
-extern "C" void cset(char y, char x, char c);
-extern "C" void bset(char y, char x, char b);
-extern "C" void fset(char y, char x, char f);
-extern "C" char btnp();
-extern "C" void nset(char c, char n);
-extern "C" void vset(char c, char v);
+__attribute__((import_name("fset")))
+extern "C"
+void fset(int y, int x, int f);
 
-constexpr char HEIGHT = 16;
-constexpr char WIDTH = 32;
-constexpr char CHANNELS = 4;
+__attribute__((import_name("btnp")))
+extern "C"
+int btnp();
 
-std::array<std::array<char, WIDTH>, HEIGHT> cbuf;
-std::array<std::array<char, WIDTH>, HEIGHT> bbuf;
-std::array<std::array<char, WIDTH>, HEIGHT> fbuf;
-std::array<char, CHANNELS> nbuf;
-std::array<char, CHANNELS> vbuf;
+__attribute__((import_name("nset")))
+extern "C"
+void nset(int c, int n);
 
-std::array<std::array<char, WIDTH>, HEIGHT> cscr;
-std::array<std::array<char, WIDTH>, HEIGHT> bscr;
-std::array<std::array<char, WIDTH>, HEIGHT> fscr;
-std::array<char, CHANNELS> nsnd;
-std::array<char, CHANNELS> vsnd;
+__attribute__((import_name("vset")))
+extern "C"
+void vset(int c, int v);
 
-extern "C" EMSCRIPTEN_KEEPALIVE void flip() {
-	for (char y = 0; y < HEIGHT; ++y) {
-		for (char x = 0; x < WIDTH; ++x) {
+constexpr int HEIGHT = 16;
+constexpr int WIDTH = 32;
+constexpr int CHANNELS = 4;
+
+int cbuf[HEIGHT][WIDTH];
+int bbuf[HEIGHT][WIDTH];
+int fbuf[HEIGHT][WIDTH];
+int nbuf[CHANNELS];
+int vbuf[CHANNELS];
+
+int cscr[HEIGHT][WIDTH];
+int bscr[HEIGHT][WIDTH];
+int fscr[HEIGHT][WIDTH];
+int nsnd[CHANNELS];
+int vsnd[CHANNELS];
+
+__attribute__((export_name("flip")))
+extern "C"
+void flip() {
+	for (int y = 0; y < HEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
 			if (cbuf[y][x] != cscr[y][x]) {
 				cset(y, x, cbuf[y][x]);
+				cscr[y][x] = cbuf[y][x];
 			}
 			if (bbuf[y][x] != bscr[y][x]) {
 				bset(y, x, bbuf[y][x]);
+				bscr[y][x] = bbuf[y][x];
 			}
 			if (fbuf[y][x] != fscr[y][x]) {
 				fset(y, x, fbuf[y][x]);
+				fscr[y][x] = fbuf[y][x];
 			}
 		}
 	}
-	cscr = cbuf;
-	bscr = bbuf;
-	fscr = fbuf;
 
-	for (char c = 0; c < CHANNELS; ++c) {
+	for (int c = 0; c < CHANNELS; ++c) {
 		if (nbuf[c] != nsnd[c]) {
 			nset(c, nbuf[c]);
+			nsnd[c] = nbuf[c];
 		}
 		if (vbuf[c] != vsnd[c]) {
 			vset(c, vbuf[c]);
+			vsnd[c] = vbuf[c];
 		}
+		vbuf[c] = 0;
 	}
-	nsnd = nbuf;
-	vsnd = vbuf;
-	vbuf.fill(0);
 }
 
-extern "C" void update();
+extern "C"
+void update();
 
-extern "C" EMSCRIPTEN_KEEPALIVE void call_update() {
+__attribute__((export_name("call_update")))
+extern "C"
+void call_update() {
 	update();
 }
 
 namespace ui {
 
-void cset(char y, char x, char character, char foreground, char background) {
+void cset(int y, int x, int character, int foreground, int background) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
 		return;
 	}
@@ -80,18 +98,18 @@ void cset(char y, char x, char character, char foreground, char background) {
 }
 
 void cls() {
-	for (char y = 0; y < HEIGHT; ++y) {
-		for (char x = 0; x < WIDTH; ++x) {
+	for (int y = 0; y < HEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
 			cset(y, x, ' ', WHITE, BLACK);
 		}
 	}
 }
 
-char btnp() {
+int btnp() {
 	return ::btnp();
 }
 
-void sfx(char channel, char note, char volume) {
+void sfx(int channel, int note, int volume) {
 	nbuf[channel] = note;
 	vbuf[channel] = volume;
 }
