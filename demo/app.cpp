@@ -12,7 +12,26 @@ int j = 0;
 int fy = 3;
 int explosion = 0;
 
-extern "C" void update() {
+__attribute__((export_name("btnp")))
+extern "C"
+void btnp(int b) {
+	if (b == ui::UP) {
+		y -= 1;
+	}
+	if (b == ui::DOWN) {
+		y += 1;
+	}
+	if (b == ui::LEFT) {
+		x -= 1;
+	}
+	if (b == ui::RIGHT) {
+		x += 1;
+	}
+}
+
+__attribute__((export_name("update")))
+extern "C"
+void update() {
 	if (y == 8 && 8 <= x && x <= 10) {
 		ui::sfx(ui::SINE, 60+x-8, ui::FORTE);
 		ui::sfx(ui::TRIANGLE, 64+x-8, ui::FORTE);
@@ -39,21 +58,6 @@ extern "C" void update() {
 		ui::sfx(ui::SAWTOOTH, ns[i], ui::FORTE);
 	}
 	ui::cset(ys[i], xs[i], 'U', 8, 1);
-	while (int b = ui::btnp()) {
-		if (b == 1) {
-			y -= 1;
-		}
-		if (b == 2) {
-			y += 1;
-		}
-		if (b == 3) {
-			x -= 1;
-		}
-		if (b == 4) {
-			x += 1;
-			++i;
-		}
-	}
 	if (explosion == 0 && y == fy && x == j) {
 		explosion = 1;
 	}

@@ -34,9 +34,18 @@ enum {
 	FORTE,
 };
 
+enum {
+	NO_INPUT,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	PRIMARY,
+	SECONDARY,
+};
+
 void cset(int y, int x, int character, int foreground = COLORS, int background = COLORS);
 void cls();
-int btnp();
 void sfx(int channel, int note, int volume);
 
 } // namespace ui

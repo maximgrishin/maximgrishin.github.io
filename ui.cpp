@@ -12,10 +12,6 @@ __attribute__((import_name("fset")))
 extern "C"
 void fset(int y, int x, int f);
 
-__attribute__((import_name("btnp")))
-extern "C"
-int btnp();
-
 __attribute__((import_name("nset")))
 extern "C"
 void nset(int c, int n);
@@ -73,15 +69,6 @@ void flip() {
 	}
 }
 
-extern "C"
-void update();
-
-__attribute__((export_name("call_update")))
-extern "C"
-void call_update() {
-	update();
-}
-
 namespace ui {
 
 void cset(int y, int x, int character, int foreground, int background) {
@@ -103,10 +90,6 @@ void cls() {
 			cset(y, x, ' ', WHITE, BLACK);
 		}
 	}
-}
-
-int btnp() {
-	return ::btnp();
 }
 
 void sfx(int channel, int note, int volume) {

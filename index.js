@@ -63,9 +63,9 @@ window.onresize();
 const inp = document.createElement("input");
 inp.style.position = "relative";
 inp.style.top = -1000;
-document.addEventListener("click", () => {
+document.onclick = function() {
 	inp.focus();
-});
+};
 box.appendChild(inp);
 
 function cset(y, x, c) {
@@ -142,28 +142,33 @@ function print(y, x, msg) {
 }
 print(14, 6, "controls: WASD, O, P");
 
-function btnp() {
-	if (inp.value != '') {
+function processInp() {
+	while (inp.value != '') {
 		const head = inp.value[0];
 		inp.value = inp.value.slice(1);
 		if (head == 'w' || head == 'W') {
-			return 1;
+			window.btnp(1);
 		}
-		if (head == 's' || head == 'S') {
-			return 2;
+		else if (head == 's' || head == 'S') {
+			window.btnp(2);
 		}
-		if (head == 'a' || head == 'A') {
-			return 3;
+		else if (head == 'a' || head == 'A') {
+			window.btnp(3);
 		}
-		if (head == 'd' || head == 'D') {
-			return 4;
+		else if (head == 'd' || head == 'D') {
+			window.btnp(4);
+		}
+		else if (head == 'p' || head == 'P') {
+			window.btnp(5);
+		}
+		else if (head == 'o' || head == 'O') {
+			window.btnp(6);
 		}
 	}
-	return 0;
 }
-window.btnp = btnp;
 
 function frameCallback() {
+	processInp();
 	window.update();
 	window.flip();
 	requestAnimationFrame(frameCallback);
@@ -202,9 +207,10 @@ function vset(ch, volume) {
 }
 window.vset = vset;
 
-const importObject = {env:{cset,bset,fset,btnp,nset,vset}};
+const importObject = {env:{cset,bset,fset,nset,vset}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	window.update = obj.instance.exports.call_update;
+	window.btnp = obj.instance.exports.btnp;
+	window.update = obj.instance.exports.update;
 	window.flip = obj.instance.exports.flip;
 	box.addEventListener("click", () => {
 		cls();
