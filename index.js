@@ -63,6 +63,7 @@ window.onresize();
 const inp = document.createElement("input");
 inp.style.position = "absolute";
 inp.style.top = 0;
+inp.style.color = "transparent";
 inp.style.background = "transparent";
 inp.style.border = "none";
 inp.style.outline = "none";
