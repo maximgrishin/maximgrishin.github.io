@@ -26,51 +26,60 @@ document.body.style.margin = 0;
 document.body.style.padding = 0;
 document.body.style.fontFamily = "monospace";
 document.body.style.whiteSpace = "nowrap";
+document.body.style.height = "100vh";
+document.querySelector("html").style.overflow = "hidden";
+document.body.style.overflow = "hidden";
 
 const box = document.createElement("div");
+
+const inp = document.createElement("input");
+inp.style.position = "absolute";
+inp.style.top = 0;
+document.onclick = function() {
+	inp.focus();
+};
+inp.style.opacity = 0;
+box.appendChild(inp);
+
+const table = document.createElement("table");
+table.style.borderSpacing = 0;
+box.appendChild(table);
 const cells = Array();
 for (let i = 0; i < HEIGHT; ++i) {
+	const tr = document.createElement("tr");
+	table.appendChild(tr);
 	const row = Array();
 	for (let j = 0; j < WIDTH; ++j) {
-		const cell = document.createElement("span");
-		row.push(cell);
-		box.appendChild(cell);
+		const td = document.createElement("td");
+		td.style.padding = 0;
+		td.style.margin = 0;
+		td.style.width = "fit-content";
+		row.push(td);
+		tr.appendChild(td);
 	}
 	cells.push(row);
-	box.appendChild(document.createElement("br"));
 }
 document.body.appendChild(box);
 box.style.width = "fit-content";
 box.style.margin = "auto";
 
-const fontSizeFor1pxScreenWidth = function() {
+const boxWidthFor1pxFont = function() {
 	const canvas = document.createElement("canvas");
 	const context = canvas.getContext("2d");
-	const metricsHeight = 1000;
-	context.font = metricsHeight + "px monospace";
+	const testHeight = 1000;
+	context.font = testHeight + "px monospace";
 	const metrics = context.measureText("a".repeat(WIDTH));
-	return metricsHeight/metrics.width;
+	return metrics.width/testHeight;
 }();
 
 window.onresize = function() {
-	const currentFontSize = parseFloat(window.getComputedStyle(box, null).getPropertyValue('font-size'));
-	const landscapeFontSize = currentFontSize*window.innerHeight/box.offsetHeight;
-	const portraitFontSize = window.innerWidth*fontSizeFor1pxScreenWidth;
-	document.body.style.fontSize = Math.min(landscapeFontSize, portraitFontSize);
+	const bound = Math.min(window.innerHeight, window.innerWidth);
+	document.querySelectorAll("td").forEach(data => {data.style.fontSize = bound/boxWidthFor1pxFont;});
+	document.querySelectorAll("tr").forEach(row => {row.style.lineHeight = bound/HEIGHT + "px";});
 };
-window.onresize();
-
-const inp = document.createElement("input");
-inp.style.position = "absolute";
-inp.style.top = 0;
-inp.style.color = "transparent";
-inp.style.background = "transparent";
-inp.style.border = "none";
-inp.style.outline = "none";
-document.onclick = function() {
-	inp.focus();
-};
-box.appendChild(inp);
+requestAnimationFrame(()=>{
+	window.onresize();
+});
 
 function cset(y, x, c) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
@@ -146,7 +155,7 @@ function print(y, x, msg) {
 }
 print(14, 6, "controls: WASD, O, P");
 
-function processInp() {
+function processInput() {
 	while (inp.value != '') {
 		const head = inp.value[0];
 		inp.value = inp.value.slice(1);
@@ -172,7 +181,7 @@ function processInp() {
 }
 
 function frameCallback() {
-	processInp();
+	processInput();
 	window.update();
 	window.flip();
 	requestAnimationFrame(frameCallback);
@@ -180,10 +189,11 @@ function frameCallback() {
 
 const audioCtx = new AudioContext();
 const types = ["sine", "square", "triangle", "sawtooth"];
+const CHANNELS = types.length;
 const shares = [3/8, 1/8, 3/8, 1/8];
 const osc = [];
 const gain = [];
-for (let i = 0; i < 4; ++i) {
+for (let i = 0; i < CHANNELS; ++i) {
 	osc.push(new OscillatorNode(audioCtx, {
 	type: types[i],
 	frequency: 440,
@@ -216,13 +226,13 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 	window.btnp = obj.instance.exports.btnp;
 	window.update = obj.instance.exports.update;
 	window.flip = obj.instance.exports.flip;
-	box.addEventListener("click", () => {
+	document.body.addEventListener("click", () => {
 		cls();
 		frameCallback();
 		if (audioCtx.state === "suspended") {
 			audioCtx.resume();
 		}
-		for (let i = 0; i < 4; ++i) {
+		for (let i = 0; i < CHANNELS; ++i) {
 			osc[i].start(audioCtx.currentTime);
 		}
 	}, {once: true});
