@@ -61,8 +61,11 @@ window.onresize = function() {
 window.onresize();
 
 const inp = document.createElement("input");
-inp.style.position = "relative";
-inp.style.top = -1000;
+inp.style.position = "absolute";
+inp.style.top = 0;
+inp.style.background = "transparent";
+inp.style.border = "none";
+inp.style.outline = "none";
 document.onclick = function() {
 	inp.focus();
 };
