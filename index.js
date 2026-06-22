@@ -211,8 +211,8 @@ window.nset = nset;
 
 function vset(ch, volume) {
 	volume = Math.max(0, volume);
-	volume = Math.min(3, volume);
-	volume /= 3;
+	volume = Math.min(2, volume);
+	volume /= 2;
 	volume *= shares[ch];
 	if (volume == 0) {
 		volume = 0.0001;
@@ -235,5 +235,12 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 		for (let i = 0; i < CHANNELS; ++i) {
 			osc[i].start(audioCtx.currentTime);
 		}
+		window.addEventListener("visibilitychange", () => {
+			if (document.hidden) {
+				audioCtx.suspend();
+			} else {
+				audioCtx.resume();
+			}
+		});
 	}, {once: true});
 });

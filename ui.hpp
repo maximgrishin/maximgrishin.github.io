@@ -30,7 +30,6 @@ enum {
 enum {
 	SILENT,
 	PIANO,
-	MEZZO,
 	FORTE,
 };
 

@@ -33,8 +33,8 @@ __attribute__((export_name("update")))
 extern "C"
 void update() {
 	if (y == 8 && 8 <= x && x <= 10) {
-		ui::sfx(ui::SINE, 60+x-8, ui::FORTE);
-		ui::sfx(ui::TRIANGLE, 64+x-8, ui::FORTE);
+		ui::sfx(ui::SINE, 60+x-8, x-7);
+		ui::sfx(ui::TRIANGLE, 64+x-8, x-7);
 	}
 	ui::cls();
 	ui::cset(8,8,' ',9,9);
