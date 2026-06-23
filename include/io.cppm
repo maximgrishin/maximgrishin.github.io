@@ -110,8 +110,8 @@ enum Button {
 	Down,
 	Left,
 	Right,
-	Primary,
-	Secondary,
+	ButtonA,
+	ButtonB,
 };
 
 void cset(int y, int x, int character, int foreground = Colors, int background = Colors) {
