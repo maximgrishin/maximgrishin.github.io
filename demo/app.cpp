@@ -1,4 +1,4 @@
-#include "../ui.hpp"
+import io;
 
 int y = 8;
 int x = 16;
@@ -12,34 +12,30 @@ int j = 0;
 int fy = 3;
 int explosion = 0;
 
-__attribute__((export_name("btnp")))
-extern "C"
-void btnp(int b) {
-	if (b == ui::UP) {
+void io::btnp(io::Button b) {
+	if (b == io::Up) {
 		y -= 1;
 	}
-	if (b == ui::DOWN) {
+	if (b == io::Down) {
 		y += 1;
 	}
-	if (b == ui::LEFT) {
+	if (b == io::Left) {
 		x -= 1;
 	}
-	if (b == ui::RIGHT) {
+	if (b == io::Right) {
 		x += 1;
 	}
 }
 
-__attribute__((export_name("update")))
-extern "C"
-void update() {
+void io::update() {
 	if (y == 8 && 8 <= x && x <= 10) {
-		ui::sfx(ui::SINE, 60+x-8, x-7);
-		ui::sfx(ui::TRIANGLE, 64+x-8, x-7);
+		io::sfx(io::Sine, 60+x-8, x-7);
+		io::sfx(io::Triangle, 64+x-8, x-7);
 	}
-	ui::cls();
-	ui::cset(8,8,' ',9,9);
-	ui::cset(8,9,' ',9,9);
-	ui::cset(8,10,' ',9,9);
+	io::cls();
+	io::cset(8,8,' ',9,9);
+	io::cset(8,9,' ',9,9);
+	io::cset(8,10,' ',9,9);
 	bool in = x == 1 && y == 1;
 	ii += 1;
 	if (!in) {
@@ -55,37 +51,37 @@ void update() {
 			ii = 0;
 		}
 		int ns[] {61,63,66,68,70,68,66,63};
-		ui::sfx(ui::SAWTOOTH, ns[i], ui::FORTE);
+		io::sfx(io::Sawtooth, ns[i], io::Forte);
 	}
-	ui::cset(ys[i], xs[i], 'U', 8, 1);
+	io::cset(ys[i], xs[i], 'U', 8, 1);
 	if (explosion == 0 && y == fy && x == j) {
 		explosion = 1;
 	}
 	if (explosion == 0) {
 		++j;
 		j %= 32;
-		ui::cset(fy, j, 'X', 10, 0);
+		io::cset(fy, j, 'X', 10, 0);
 	} else {
 		if (explosion <= 4) {
-			ui::cset(fy, j+1, '/', 10, 0);
-			ui::cset(fy, j-1, '/', 10, 0);
-			ui::cset(fy+1, j, '.', 10, 0);
+			io::cset(fy, j+1, '/', 10, 0);
+			io::cset(fy, j-1, '/', 10, 0);
+			io::cset(fy+1, j, '.', 10, 0);
 				++explosion;
-			ui::sfx(ui::SQUARE, 84, ui::FORTE);
+			io::sfx(io::Square, 84, io::Forte);
 			}
 		else if (explosion <= 8) {
-			ui::cset(fy, j+2, '-', 10, 0);
-			ui::cset(fy, j-2, '/', 10, 0);
-			ui::cset(fy+2,j+1,'|', 10, 0);
+			io::cset(fy, j+2, '-', 10, 0);
+			io::cset(fy, j-2, '/', 10, 0);
+			io::cset(fy+2,j+1,'|', 10, 0);
 				++explosion;
-			ui::sfx(ui::SQUARE, 82, ui::FORTE);
+			io::sfx(io::Square, 82, io::Forte);
 			}
 		else if (explosion <= 12) {
-			ui::cset(fy-2,j+2,'/', 10, 0);
-			ui::cset(fy, j-3, '.', 10, 0);
-			ui::cset(fy+3,j+1,'.', 10, 0);
+			io::cset(fy-2,j+2,'/', 10, 0);
+			io::cset(fy, j-3, '.', 10, 0);
+			io::cset(fy+3,j+1,'.', 10, 0);
 				++explosion;
-			ui::sfx(ui::SQUARE, 80, ui::FORTE);
+			io::sfx(io::Square, 80, io::Forte);
 			}
 		else {
 			j = 0;
@@ -94,5 +90,5 @@ void update() {
 			explosion = 0;
 		}
 	}
-	ui::cset(y, x, 'B', ui::BLUE, ui::GREEN);
+	io::cset(y, x, 'B', io::Blue, io::Green);
 }

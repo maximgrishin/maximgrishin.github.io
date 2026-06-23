@@ -223,8 +223,8 @@ window.vset = vset;
 
 const importObject = {env:{cset,bset,fset,nset,vset}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	window.btnp = obj.instance.exports.btnp;
-	window.update = obj.instance.exports.update;
+	window.btnp = obj.instance.exports.call_btnp;
+	window.update = obj.instance.exports.call_update;
 	window.flip = obj.instance.exports.flip;
 	document.body.addEventListener("click", () => {
 		cls();

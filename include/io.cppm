@@ -1,4 +1,4 @@
-#include "ui.hpp"
+export module io;
 
 __attribute__((import_name("cset")))
 extern "C"
@@ -69,17 +69,60 @@ void flip() {
 	}
 }
 
-namespace ui {
+export namespace io {
 
-void cset(int y, int x, int character, int foreground, int background) {
+enum {
+	Black,
+	DarkBlue,
+	DarkPurple,
+	DarkGreen,
+	Brown,
+	DarkGray,
+	LightGray,
+	White,
+	Red,
+	Orange,
+	Yellow,
+	Green,
+	Blue,
+	Indigo,
+	Pink,
+	Peach,
+	Colors,
+};
+
+enum {
+	Sine,
+	Square,
+	Triangle,
+	Sawtooth,
+};
+
+enum {
+	Silent,
+	Piano,
+	Forte,
+};
+
+enum Button {
+	NoInput,
+	Up,
+	Down,
+	Left,
+	Right,
+	Primary,
+	Secondary,
+};
+
+void cset(int y, int x, int character, int foreground = Colors, int background = Colors) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
 		return;
 	}
 	cbuf[y][x] = character;
-	if (0 <= background && background < COLORS) {
+	if (0 <= background && background < Colors) {
 		bbuf[y][x] = background;
 	}
-	if (0 <= foreground && foreground < COLORS) {
+	if (0 <= foreground && foreground < Colors) {
 		fbuf[y][x] = foreground;
 	}
 }
@@ -87,7 +130,7 @@ void cset(int y, int x, int character, int foreground, int background) {
 void cls() {
 	for (int y = 0; y < HEIGHT; ++y) {
 		for (int x = 0; x < WIDTH; ++x) {
-			cset(y, x, ' ', WHITE, BLACK);
+			cset(y, x, ' ', White, Black);
 		}
 	}
 }
@@ -97,4 +140,19 @@ void sfx(int channel, int note, int volume) {
 	vbuf[channel] = volume;
 }
 
-} // namespace ui
+extern "C++" void btnp(Button b);
+extern "C++" void update();
+
+} // namespace io
+
+__attribute__((export_name("call_btnp")))
+extern "C"
+void call_btnp(io::Button b) {
+	io::btnp(b);
+}
+
+__attribute__((export_name("call_update")))
+extern "C"
+void call_update() {
+	io::update();
+}
