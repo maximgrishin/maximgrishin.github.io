@@ -24,10 +24,10 @@ build/pcm/io.pcm: include/io.cppm
 
 build/pcm: build/pcm/io.pcm
 
-build/site/demo/compiled.wasm: demo/app.cpp build/pcm
+build/site/demo/compiled.wasm: demo/app.cpp build/pcm include/memset.cpp
 	mkdir -p build/site/demo
-	clang++ $(FLAGS) -nostdlib -Wl,--no-entry -fprebuilt-module-path=build/pcm build/pcm/io.pcm demo/app.cpp -o build/site/demo/compiled.wasm
+	clang++ $(FLAGS) -nostdlib -Wl,--no-entry -fprebuilt-module-path=build/pcm build/pcm/io.pcm include/memset.cpp demo/app.cpp -o build/site/demo/compiled.wasm
 
-build/site/chin/compiled.wasm: chin/app.cpp chin/chr.c build/pcm
+build/site/chin/compiled.wasm: chin/app.cpp chin/chr.c build/pcm include/memset.cpp
 	mkdir -p build/site/chin
-	clang++ $(FLAGS) -nostdlib -Wl,--no-entry -fprebuilt-module-path=build/pcm build/pcm/io.pcm chin/app.cpp -o build/site/chin/compiled.wasm
+	clang++ $(FLAGS) -nostdlib -Wl,--no-entry -fprebuilt-module-path=build/pcm build/pcm/io.pcm include/memset.cpp chin/app.cpp -o build/site/chin/compiled.wasm
