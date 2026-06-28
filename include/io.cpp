@@ -1,5 +1,3 @@
-export module io;
-
 __attribute__((import_name("cset")))
 extern "C"
 void cset(int y, int x, int c);
@@ -69,52 +67,11 @@ void flip() {
 	}
 }
 
-export namespace io {
+#include "io.hpp"
 
-enum {
-	Black,
-	DarkBlue,
-	DarkPurple,
-	DarkGreen,
-	Brown,
-	DarkGray,
-	LightGray,
-	White,
-	Red,
-	Orange,
-	Yellow,
-	Green,
-	Blue,
-	Indigo,
-	Pink,
-	Peach,
-	Colors,
-};
+namespace io {
 
-enum {
-	Sine,
-	Square,
-	Triangle,
-	Sawtooth,
-};
-
-enum {
-	Silent,
-	Piano,
-	Forte,
-};
-
-enum Button {
-	NoInput,
-	Up,
-	Down,
-	Left,
-	Right,
-	ButtonA,
-	ButtonB,
-};
-
-void cset(int y, int x, int character, int foreground = Colors, int background = Colors) {
+void cset(int y, int x, int character, int foreground, int background) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
 		return;
 	}
@@ -139,9 +96,6 @@ void sfx(int channel, int note, int volume) {
 	nbuf[channel] = note;
 	vbuf[channel] = volume;
 }
-
-extern "C++" void btnp(Button b);
-extern "C++" void update();
 
 } // namespace io
 

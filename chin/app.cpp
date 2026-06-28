@@ -1,6 +1,6 @@
-import io;
-
 #include "chr.c"
+
+#include "io.hpp"
 
 int x;
 int y = 12;

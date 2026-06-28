@@ -1,4 +1,4 @@
-import io;
+#include "io.hpp"
 
 int y = 8;
 int x = 16;
