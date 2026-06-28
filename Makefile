@@ -1,31 +1,42 @@
-all: demo chin
+CXXFLAGS += -std=c++26 --target=wasm32 -Os -Wall -Wextra -Werror -Iinclude
+LINKFLAGS += -nostdlib -Wl,--no-entry
 
-FLAGS := -std=c++26 --target=wasm32 -Os -Wall -Werror
+BUILD_DIR := build
+SITE_DIR := build/site
+COMPILED_NAME := compiled.wasm
+APP_JS := app.js
+APP_HTML := app.html
 
-demo: build/site/demo/compiled.wasm build/site/demo/index.html build/site/index.js
+APP_DIRS := $(shell find -type f -wholename "./*/app.cpp")
+APPS := $(patsubst ./%/app.cpp, %, $(APP_DIRS))
 
-chin: build/site/chin/compiled.wasm build/site/chin/index.html build/site/index.js
+COMMON_DIR := include
+COMMON_CPP := $(shell find -type f -wholename "./$(COMMON_DIR)/*.cpp")
+COMMON_OBJ := $(patsubst ./%.cpp, $(BUILD_DIR)/%.o, $(COMMON_CPP))
 
-build/site/index.js: index.js
-	mkdir -p build/site
-	cp index.js build/site
+.PHONY: all
+all: $(APPS) $(SITE_DIR)/$(APP_JS)
 
-build/site/demo/index.html: index.html
-	mkdir -p build/site/demo
-	cp index.html build/site/demo/index.html
+$(SITE_DIR)/$(APP_JS): $(APP_JS)
+	mkdir -p $(@D)
+	cp $(APP_JS) $(SITE_DIR)/$(APP_JS)
 
-build/site/chin/index.html: index.html
-	mkdir -p build/site/chin
-	cp index.html build/site/chin/index.html
+define GROUP
+$(1)_CPP := $$(shell find -type f -wholename "./$(1)/*.cpp")
+$(1)_OBJ := $$(patsubst ./%.cpp, $(BUILD_DIR)/%.o, $$($(1)_CPP))
+$(1): $(SITE_DIR)/$(1)/$(COMPILED_NAME)
+endef
 
-build/include/io.o: include/io.cpp
-	mkdir -p build/include
-	clang++ $(FLAGS) include/io.cpp -c -o build/include/io.o
+define BUILD
+$(SITE_DIR)/$(1)/$(COMPILED_NAME): $($(1)_OBJ) $(COMMON_OBJ) $(APP_HTML)
+	mkdir -p $(SITE_DIR)/$(1)
+	$(CXX) $(CXXFLAGS) $(LINKFLAGS) $($(1)_OBJ) $(COMMON_OBJ) -o $(SITE_DIR)/$(1)/$(COMPILED_NAME)
+	cp $(APP_HTML) $(SITE_DIR)/$(1)/index.html
+endef
 
-build/site/demo/compiled.wasm: demo/app.cpp build/include/io.o include/memset.cpp
-	mkdir -p build/site/demo
-	clang++ $(FLAGS) -nostdlib -Iinclude -Wl,--no-entry -fprebuilt-module-path=build/pcm build/include/io.o include/memset.cpp demo/app.cpp -o build/site/demo/compiled.wasm
+$(foreach 1, $(APPS), $(eval $(call GROUP,$(1))))
+$(foreach 1, $(APPS), $(eval $(call BUILD,$(1))))
 
-build/site/chin/compiled.wasm: chin/app.cpp chin/chr.c build/include/io.o include/memset.cpp
-	mkdir -p build/site/chin
-	clang++ $(FLAGS) -nostdlib -Iinclude -Wl,--no-entry -fprebuilt-module-path=build/pcm build/include/io.o include/memset.cpp chin/app.cpp -o build/site/chin/compiled.wasm
+$(BUILD_DIR)/%.o: %.cpp
+	mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $< -c -o $@
