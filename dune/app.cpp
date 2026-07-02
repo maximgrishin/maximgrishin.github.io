@@ -186,8 +186,8 @@ void io::update() {
 		}
 	}
 	char spin = (int[]){'-','\\','|','/'}[t / 32 % 4];
-	io::cset(9,15,spin,12,1);
-	io::cset(9,21,spin,12,6);
+	io::cset(9,10,spin,12,1);
+	io::cset(9,16,spin,12,6);
 	io::cset(12,4,' ',5,5);
 	io::cset(12,5,' ',5,5);
 	io::cset(13,4,' ',5,5);
