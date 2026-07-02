@@ -93,8 +93,12 @@ void cls() {
 }
 
 void sfx(int channel, int note, int volume) {
-	nbuf[channel] = note;
-	vbuf[channel] = volume;
+	if (note == 0) {
+		vbuf[channel] = 0;
+	} else {
+		nbuf[channel] = note;
+		vbuf[channel] = volume;
+	}
 }
 
 } // namespace io
