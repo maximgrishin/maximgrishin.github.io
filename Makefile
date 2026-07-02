@@ -1,3 +1,4 @@
+CXX := clang++
 CXXFLAGS += -std=c++26 --target=wasm32 -Os -Wall -Wextra -Werror -Iinclude
 LINKFLAGS += -nostdlib -Wl,--no-entry
 
