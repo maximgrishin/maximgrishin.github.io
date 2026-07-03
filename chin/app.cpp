@@ -125,7 +125,7 @@ bool in_canvas() {
 	return 0 <= x && x < SIDE && 0 <= y && y < SIDE;
 }
 
-void io::btnp(io::Button b) {
+void btnp(io::Button b) {
 	if (b == io::Up) {
 		if ((mode == Demo && y == 12) || (mode != Demo && y > 0)) {
 			y -= 1;
@@ -228,7 +228,7 @@ void print(int y, int x, char const *str) {
 	}
 }
 
-void io::update() {
+void update() {
 	io::cls();
 	draw_grid();
 	if (mode == Demo) {
@@ -309,4 +309,9 @@ void io::update() {
 		io::cset(14, 11, '0' + (x+1)/10, io::DarkGray);
 		io::cset(14, 12, '0' + (x+1)%10, io::DarkGray);
 	}
+}
+
+void io::init() {
+	io::registerUpdate(update);
+	io::registerBtnp(btnp);
 }

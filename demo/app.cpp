@@ -12,7 +12,7 @@ int j = 0;
 int fy = 3;
 int explosion = 0;
 
-void io::btnp(io::Button b) {
+void btnp(io::Button b) {
 	if (b == io::Up) {
 		y -= 1;
 	}
@@ -27,7 +27,7 @@ void io::btnp(io::Button b) {
 	}
 }
 
-void io::update() {
+void update() {
 	if (y == 8 && 8 <= x && x <= 10) {
 		io::sfx(io::Sine, 60+x-8, x-7);
 		io::sfx(io::Triangle, 64+x-8, x-7);
@@ -91,4 +91,9 @@ void io::update() {
 		}
 	}
 	io::cset(y, x, 'B', io::Blue, io::Green);
+}
+
+void io::init() {
+	io::registerUpdate(update);
+	io::registerBtnp(btnp);
 }

@@ -1,7 +1,5 @@
 #include "io.hpp"
 
-void io::btnp(io::Button) {}
-
 constexpr int speed = 2;
 
 int transpose(int note, int shift) {
@@ -130,7 +128,7 @@ void bridge(int tick) {
 
 int t;
 
-void io::update() {
+void update() {
 	++t;
 	t %= 768*speed;
 	if (t < 128*speed) {
@@ -197,4 +195,8 @@ void io::update() {
 	io::cset(3,0,' ',4,4);
 	io::cset(15,26,' ',4,4);
 	io::cset(15,27,' ',4,4);
+}
+
+void io::init() {
+	io::registerUpdate(update);
 }

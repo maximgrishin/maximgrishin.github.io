@@ -49,7 +49,9 @@ void cset(int y, int x, int character, int foreground = Colors, int background =
 void cls();
 void sfx(int channel, int note, int volume);
 
-extern "C++" void btnp(Button b);
-extern "C++" void update();
+void registerUpdate(void (*func)());
+void registerBtnp(void (*func)(Button ));
+
+extern "C++" void init();
 
 }

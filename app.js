@@ -160,22 +160,22 @@ function processInput() {
 		const head = inp.value[0];
 		inp.value = inp.value.slice(1);
 		if (head == 'w' || head == 'W') {
-			window.btnp(1);
+			window.call_onbutton(1);
 		}
 		else if (head == 's' || head == 'S') {
-			window.btnp(2);
+			window.call_onbutton(2);
 		}
 		else if (head == 'a' || head == 'A') {
-			window.btnp(3);
+			window.call_onbutton(3);
 		}
 		else if (head == 'd' || head == 'D') {
-			window.btnp(4);
+			window.call_onbutton(4);
 		}
 		else if (head == 'p' || head == 'P') {
-			window.btnp(5);
+			window.call_onbutton(5);
 		}
 		else if (head == 'o' || head == 'O') {
-			window.btnp(6);
+			window.call_onbutton(6);
 		}
 	}
 }
@@ -183,8 +183,7 @@ function processInput() {
 function frameCallback() {
 	const FPS = 30;
 	processInput();
-	window.update();
-	window.flip();
+	window.call_onframe();
 	setTimeout(frameCallback, 1000/FPS);
 }
 
@@ -224,9 +223,9 @@ window.vset = vset;
 
 const importObject = {env:{cset,bset,fset,nset,vset}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	window.btnp = obj.instance.exports.call_btnp;
-	window.update = obj.instance.exports.call_update;
-	window.flip = obj.instance.exports.flip;
+	window.call_onbutton = obj.instance.exports.call_onbutton;
+	window.call_onframe = obj.instance.exports.call_onframe;
+	obj.instance.exports.call_oninit();
 	document.body.addEventListener("click", () => {
 		cls();
 		frameCallback();

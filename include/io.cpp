@@ -1,3 +1,7 @@
+#include "io.hpp"
+
+namespace {
+
 __attribute__((import_name("cset")))
 extern "C"
 void cset(int y, int x, int c);
@@ -34,8 +38,6 @@ int fscr[HEIGHT][WIDTH];
 int nsnd[CHANNELS];
 int vsnd[CHANNELS];
 
-__attribute__((export_name("flip")))
-extern "C"
 void flip() {
 	for (int y = 0; y < HEIGHT; ++y) {
 		for (int x = 0; x < WIDTH; ++x) {
@@ -67,7 +69,33 @@ void flip() {
 	}
 }
 
-#include "io.hpp"
+void (*update)();
+void (*btnp)(io::Button);
+
+__attribute__((export_name("call_onbutton")))
+extern "C"
+void call_onbutton(io::Button b) {
+	if (btnp) {
+		btnp(b);
+	}
+}
+
+__attribute__((export_name("call_onframe")))
+extern "C"
+void call_onframe() {
+	if (update) {
+		update();
+		flip();
+	}
+}
+
+__attribute__((export_name("call_oninit")))
+extern "C"
+void call_oninit() {
+	io::init();
+}
+
+} // namespace
 
 namespace io {
 
@@ -101,16 +129,13 @@ void sfx(int channel, int note, int volume) {
 	}
 }
 
+void registerUpdate(void (*func)()) {
+	update = func;
+}
+
+void registerBtnp(void (*func)(Button)) {
+	btnp = func;
+}
+
+extern "C++" void init();
 } // namespace io
-
-__attribute__((export_name("call_btnp")))
-extern "C"
-void call_btnp(io::Button b) {
-	io::btnp(b);
-}
-
-__attribute__((export_name("call_update")))
-extern "C"
-void call_update() {
-	io::update();
-}
