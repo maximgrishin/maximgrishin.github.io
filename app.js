@@ -181,10 +181,11 @@ function processInput() {
 }
 
 function frameCallback() {
+	const FPS = 60;
 	processInput();
 	window.update();
 	window.flip();
-	requestAnimationFrame(frameCallback);
+	setTimeout(frameCallback, 1000/FPS);
 }
 
 const audioCtx = new AudioContext();
