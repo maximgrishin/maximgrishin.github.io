@@ -181,7 +181,7 @@ function processInput() {
 }
 
 function frameCallback() {
-	const FPS = 60;
+	const FPS = 30;
 	processInput();
 	window.update();
 	window.flip();

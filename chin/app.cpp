@@ -2,6 +2,8 @@
 
 #include "io.hpp"
 
+constexpr int animation_tick = 2;
+
 int x;
 int y = 12;
 
@@ -176,11 +178,11 @@ void io::btnp(io::Button b) {
 				dd();
 				if (!isdot()) {
 					dd();
-					blink_fuse = 19;
+					blink_fuse = 4*animation_tick-1;
 					if (!isdot()) {
 						dd();
-						blink_fuse = 19;
-						victory_fuse = 19;
+						blink_fuse = 4*animation_tick-1;
+						victory_fuse = 4*animation_tick-1;
 					}
 				}
 			}
@@ -218,7 +220,7 @@ void draw_canvas(bool canvas[SIDE][SIDE], int col) {
 	}
 }
 
-int animation_fuse = 10;
+int animation_fuse = 2*animation_tick;
 
 void print(int y, int x, char const *str) {
 	for (int i = 0; str[i] != 0 && x + i < 32; ++i) {
@@ -233,7 +235,7 @@ void io::update() {
 		--animation_fuse;
 		if (animation_fuse <= 0) {
 			dd();
-			animation_fuse = 5;
+			animation_fuse = animation_tick;
 		}
 	}
 	if (mode == Free) {
@@ -241,40 +243,14 @@ void io::update() {
 	}
 	else {
 		if (blink_fuse) {
-			if (blink_fuse > 1) {
-				if (blink_fuse > 15) {
-					io::sfx(io::Square, 47, io::Forte);
-				}
-				else if (blink_fuse > 10) {
-					io::sfx(io::Square, 50, io::Forte);
-				}
-				else if (blink_fuse >= 5) {
-					io::sfx(io::Square, 54, io::Forte);
-				}
-				else {
-					io::sfx(io::Square, 57, io::Forte);
-				}
-			}
+			io::sfx(io::Square, (int[]){0,57,54,50,47}[(blink_fuse + animation_tick - 2)/animation_tick], io::Forte);
 			--blink_fuse;
 			if (blink_fuse == 0) {
 				copy_canvas(stale, fresh);
 			}
 		}
 		if (victory_fuse && !blink_fuse) {
-			if (victory_fuse > 1) {
-				if (victory_fuse > 15) {
-					io::sfx(io::Square, 62, io::Forte);
-				}
-				else if (victory_fuse > 10) {
-					io::sfx(io::Square, 66, io::Forte);
-				}
-				else if (victory_fuse >= 5) {
-					io::sfx(io::Square, 69, io::Forte);
-				}
-				else {
-					io::sfx(io::Square, 74, io::Forte);
-				}
-			}
+			io::sfx(io::Square, (int[]){0,74,69,66,62}[(victory_fuse + animation_tick - 2)/animation_tick], io::Forte);
 			--victory_fuse;
 			if (victory_fuse == 0) {
 				copy_canvas(done, stale);
@@ -284,8 +260,8 @@ void io::update() {
 			pset(y, x, io::Red);
 		}
 		draw_canvas(done, io::Blue);
-		draw_canvas(stale, io::Blue + (blink_fuse ? 0 : victory_fuse/5));
-		draw_canvas(fresh, io::Green + blink_fuse/5);
+		draw_canvas(stale, io::Blue + (blink_fuse ? 0 : victory_fuse/animation_tick));
+		draw_canvas(fresh, io::Green + blink_fuse/animation_tick);
 	}
 	if (in_canvas()) {
 		if (!blink_fuse && !victory_fuse) {

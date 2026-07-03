@@ -39,13 +39,13 @@ void io::update() {
 	bool in = x == 1 && y == 1;
 	ii += 1;
 	if (!in) {
-		if (ii >= 2) {
+		if (ii >= 1) {
 			i += 1;
 			i %= 8;
 			ii = 0;
 		}
 	} else {
-		if (ii >= 8) {
+		if (ii >= 4) {
 			i += 1;
 			i %= 8;
 			ii = 0;
@@ -62,21 +62,21 @@ void io::update() {
 		j %= 32;
 		io::cset(fy, j, 'X', 10, 0);
 	} else {
-		if (explosion <= 4) {
+		if (explosion <= 2) {
 			io::cset(fy, j+1, '/', 10, 0);
 			io::cset(fy, j-1, '/', 10, 0);
 			io::cset(fy+1, j, '.', 10, 0);
 				++explosion;
 			io::sfx(io::Square, 84, io::Forte);
 			}
-		else if (explosion <= 8) {
+		else if (explosion <= 4) {
 			io::cset(fy, j+2, '-', 10, 0);
 			io::cset(fy, j-2, '/', 10, 0);
 			io::cset(fy+2,j+1,'|', 10, 0);
 				++explosion;
 			io::sfx(io::Square, 82, io::Forte);
 			}
-		else if (explosion <= 12) {
+		else if (explosion <= 6) {
 			io::cset(fy-2,j+2,'/', 10, 0);
 			io::cset(fy, j-3, '.', 10, 0);
 			io::cset(fy+3,j+1,'.', 10, 0);

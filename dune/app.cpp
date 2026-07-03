@@ -2,7 +2,7 @@
 
 void io::btnp(io::Button) {}
 
-constexpr int speed = 4;
+constexpr int speed = 2;
 
 int transpose(int note, int shift) {
 	return note != 0 ? note + shift : 0;
@@ -185,7 +185,7 @@ void io::update() {
 			io::cset(i, j, ' ', 12, 6);
 		}
 	}
-	char spin = (int[]){'-','\\','|','/'}[t / 16 % 4];
+	char spin = (int[]){'-','\\','|','/'}[t / 8 % 4];
 	io::cset(9,10,spin,12,1);
 	io::cset(9,16,spin,12,6);
 	io::cset(12,4,' ',5,5);
