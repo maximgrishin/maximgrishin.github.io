@@ -26,9 +26,10 @@ document.body.style.margin = 0;
 document.body.style.padding = 0;
 document.body.style.fontFamily = "monospace";
 document.body.style.whiteSpace = "nowrap";
-document.body.style.height = "100vh";
+document.body.style.height = "100%";
 document.querySelector("html").style.overflow = "hidden";
 document.body.style.overflow = "hidden";
+document.body.style.userSelect = "none";
 
 const box = document.createElement("div");
 
@@ -56,6 +57,8 @@ for (let i = 0; i < HEIGHT; ++i) {
 		td.style.width = "fit-content";
 		row.push(td);
 		tr.appendChild(td);
+		td.y = i;
+		td.x = j;
 	}
 	cells.push(row);
 }
@@ -184,18 +187,42 @@ document.body.addEventListener("click", () => {
 
 const importObject = {env:{cset,bset,fset,nset,vset}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	obj.instance.exports.call_oninit();
+	obj.instance.exports.oninit();
 
 	inp.addEventListener("input", () => {
-		processInput(obj.instance.exports.call_onbutton);
+		processInput(obj.instance.exports.onbutton);
 	});
 
-	document.body.addEventListener("click", () => {
-		obj.instance.exports.call_onclick(1,2);
-	});
+	let lastTouchY = 0;
+	let lastTouchX = 0;
+	function handleTouch(event) {
+		for (const changedTouch of event.changedTouches) {
+			const element = document.elementFromPoint(changedTouch.pageX, changedTouch.pageY);
+			if (element.x != undefined) {
+				const y = element.y;
+				const x = element.x;
+				if (y != lastTouchY || x != lastTouchX || event.type != "touchmove") {
+					if (event.type == "touchstart") {
+						obj.instance.exports.onmouse(y, x, 1);
+					}
+					else if (event.type == "touchmove") {
+						obj.instance.exports.onmouse(y, x, 2);
+					}
+					else if (event.type == "touchend") {
+						obj.instance.exports.onmouse(y, x, 3);
+					}
+					lastTouchY = y;
+					lastTouchX = x;
+				}
+			}
+		}
+	}
+	document.body.addEventListener("touchstart", handleTouch);
+	document.body.addEventListener("touchmove", handleTouch);
+	document.body.addEventListener("touchend", handleTouch);
 
 	const FPS = 30;
-	setInterval(obj.instance.exports.call_onframe, 1000/FPS);
+	setInterval(obj.instance.exports.onframe, 1000/FPS);
 
 	requestAnimationFrame(()=>{
 		window.onresize();

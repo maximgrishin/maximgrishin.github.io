@@ -45,12 +45,19 @@ enum Button {
 	ButtonB,
 };
 
+enum Mouse {
+	MouseDown = 1,
+	MouseMove,
+	MouseUp,
+};
+
 void cset(int y, int x, int character, int foreground = Colors, int background = Colors);
 void cls();
 void sfx(int channel, int note, int volume);
 
-void registerUpdate(void (*func)());
-void registerBtnp(void (*func)(Button ));
+void onframe(void (*func)());
+void onbutton(void (*func)(Button));
+void onmouse(void (*func)(int, int, Mouse));
 
 extern "C++" void init();
 

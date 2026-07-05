@@ -77,31 +77,15 @@ void print(int y, int x, char const *msg) {
 	}
 }
 
-void (*update)();
-void (*btnp)(io::Button);
-
-__attribute__((export_name("call_onbutton")))
-extern "C"
-void call_onbutton(io::Button b) {
-	if (btnp) {
-		btnp(b);
-	}
-}
+void (*frameCallback)();
+void (*buttonCallback)(io::Button);
+void (*mouseCallback)(int, int, io::Mouse);
 
 bool started = false;
 
-__attribute__((export_name("call_onframe")))
+__attribute__((export_name("oninit")))
 extern "C"
-void call_onframe() {
-	if (update && started) {
-		update();
-		flip();
-	}
-}
-
-__attribute__((export_name("call_oninit")))
-extern "C"
-void call_oninit() {
+void oninit() {
 	io::cls();
 	for (int i = 0; i < 7; ++i) {
 		io::cset(5 + i, 10, '|', 1 + i);
@@ -121,10 +105,32 @@ void call_oninit() {
 	flip();
 }
 
-__attribute__((export_name("call_onclick")))
+__attribute__((export_name("onframe")))
 extern "C"
-void call_onclick([[maybe_unused]] int x, [[maybe_unused]] int y) {
-	started = true;
+void onframe() {
+	if (frameCallback && started) {
+		frameCallback();
+		flip();
+	}
+}
+
+__attribute__((export_name("onbutton")))
+extern "C"
+void onbutton(io::Button b) {
+	if (buttonCallback) {
+		buttonCallback(b);
+	}
+}
+
+__attribute__((export_name("onmouse")))
+extern "C"
+void onmouse(int y, int x, io::Mouse m) {
+	if (m == io::MouseDown) {
+		started = true;
+	}
+	if (mouseCallback) {
+		mouseCallback(y, x, m);
+	}
 }
 
 } // namespace
@@ -161,12 +167,16 @@ void sfx(int channel, int note, int volume) {
 	}
 }
 
-void registerUpdate(void (*func)()) {
-	update = func;
+void onframe(void (*func)()) {
+	frameCallback = func;
 }
 
-void registerBtnp(void (*func)(Button)) {
-	btnp = func;
+void onbutton(void (*func)(Button)) {
+	buttonCallback = func;
+}
+
+void onmouse(void (*func)(int, int, Mouse)) {
+	mouseCallback = func;
 }
 
 extern "C++" void init();

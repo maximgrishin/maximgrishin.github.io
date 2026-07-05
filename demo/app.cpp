@@ -12,7 +12,7 @@ int j = 0;
 int fy = 3;
 int explosion = 0;
 
-void btnp(io::Button b) {
+void onbutton(io::Button b) {
 	if (b == io::Up) {
 		y -= 1;
 	}
@@ -27,7 +27,7 @@ void btnp(io::Button b) {
 	}
 }
 
-void update() {
+void onframe() {
 	if (y == 8 && 8 <= x && x <= 10) {
 		io::sfx(io::Sine, 60+x-8, x-7);
 		io::sfx(io::Triangle, 64+x-8, x-7);
@@ -94,6 +94,6 @@ void update() {
 }
 
 void io::init() {
-	io::registerUpdate(update);
-	io::registerBtnp(btnp);
+	io::onframe(::onframe);
+	io::onbutton(::onbutton);
 }

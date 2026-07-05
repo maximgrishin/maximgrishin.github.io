@@ -128,7 +128,7 @@ void bridge(int tick) {
 
 int t;
 
-void update() {
+void onframe() {
 	++t;
 	t %= 768*speed;
 	if (t < 128*speed) {
@@ -198,5 +198,5 @@ void update() {
 }
 
 void io::init() {
-	io::registerUpdate(update);
+	io::onframe(::onframe);
 }

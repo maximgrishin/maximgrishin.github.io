@@ -125,7 +125,23 @@ bool in_canvas() {
 	return 0 <= x && x < SIDE && 0 <= y && y < SIDE;
 }
 
-void btnp(io::Button b) {
+void handleExamPress(int y, int x) {
+	Dot& d = chars[ch].strokes[stroke][dot];
+	if (y == d.y - 1 && x == d.x - 1) {
+		dd();
+		if (!isdot()) {
+			dd();
+			blink_fuse = 4*animation_tick-1;
+			if (!isdot()) {
+				dd();
+				blink_fuse = 4*animation_tick-1;
+				victory_fuse = 4*animation_tick-1;
+			}
+		}
+	}
+}
+
+void onbutton(io::Button b) {
 	if (b == io::Up) {
 		if ((mode == Demo && y == 12) || (mode != Demo && y > 0)) {
 			y -= 1;
@@ -173,19 +189,7 @@ void btnp(io::Button b) {
 			canvas[y][x] = true;
 		}
 		else if (mode == Exam && !blink_fuse && !victory_fuse) {
-			Dot& d = chars[ch].strokes[stroke][dot];
-			if (y == d.y - 1 && x == d.x - 1) {
-				dd();
-				if (!isdot()) {
-					dd();
-					blink_fuse = 4*animation_tick-1;
-					if (!isdot()) {
-						dd();
-						blink_fuse = 4*animation_tick-1;
-						victory_fuse = 4*animation_tick-1;
-					}
-				}
-			}
+			handleExamPress(y, x);
 		}
 	}
 	if (b == io::ButtonB && in_canvas()) {
@@ -228,7 +232,7 @@ void print(int y, int x, char const *str) {
 	}
 }
 
-void update() {
+void onframe() {
 	io::cls();
 	draw_grid();
 	if (mode == Demo) {
@@ -311,7 +315,58 @@ void update() {
 	}
 }
 
+int fromYToCanvasY(int y) {
+	y -= 1;
+	if (0 <= y && y < 11) {
+		return y;
+	}
+	return -1;
+}
+
+int fromXToCanvasX(int x) {
+	x -= 5;
+	x /= 2;
+	if (0 <= x && x < 11) {
+		return x;
+	}
+	return -1;
+}
+
+bool mouseDown;
+bool freeModePaintValue;
+int lastMouseY;
+int lastMouseX;
+void onmouse(int y, int x, io::Mouse m) {
+	y = fromYToCanvasY(y);
+	x = fromXToCanvasX(x);
+	if (y == -1 || x == -1) {
+		return;
+	}
+	if (m == io::MouseDown) {
+		mouseDown = true;
+		if (mode == Free) {
+			freeModePaintValue = !canvas[y][x];
+		}
+	}
+	else if (m == io::MouseUp) {
+		mouseDown = false;
+	}
+	if (mouseDown) {
+		if (lastMouseX != x || lastMouseY != y) {
+			if (mode == Free) {
+				canvas[y][x] = freeModePaintValue;
+			}
+			else if (mode == Exam) {
+				handleExamPress(y, x);
+			}
+			lastMouseY = y;
+			lastMouseX = x;
+		}
+	}
+}
+
 void io::init() {
-	io::registerUpdate(update);
-	io::registerBtnp(btnp);
+	io::onframe(::onframe);
+	io::onbutton(::onbutton);
+	io::onmouse(::onmouse);
 }
