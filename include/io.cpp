@@ -69,6 +69,14 @@ void flip() {
 	}
 }
 
+void print(int y, int x, char const *msg) {
+	int i = 0;
+	while (msg[i] != 0) {
+		io::cset(y, x + i, msg[i], 6);
+		++i;
+	}
+}
+
 void (*update)();
 void (*btnp)(io::Button);
 
@@ -80,10 +88,12 @@ void call_onbutton(io::Button b) {
 	}
 }
 
+bool started = false;
+
 __attribute__((export_name("call_onframe")))
 extern "C"
 void call_onframe() {
-	if (update) {
+	if (update && started) {
 		update();
 		flip();
 	}
@@ -92,7 +102,29 @@ void call_onframe() {
 __attribute__((export_name("call_oninit")))
 extern "C"
 void call_oninit() {
+	io::cls();
+	for (int i = 0; i < 7; ++i) {
+		io::cset(5 + i, 10, '|', 1 + i);
+	}
+	for (int i = 0; i < 4; ++i) {
+		io::cset(5 + i, 13 + 3*i, '-', 8 + i);
+	}
+	for (int i = 0; i < 4; ++i) {
+		io::cset(11 - i, 13 + 3*i, '-', 14 - i);
+	}
+	io::cset(8, 13, 'P', 12);
+	io::cset(8, 14, 'L', 13);
+	io::cset(8, 15, 'A', 14);
+	io::cset(8, 16, 'Y', 15);
+	print(14, 6, "controls: WASD, O, P");
 	io::init();
+	flip();
+}
+
+__attribute__((export_name("call_onclick")))
+extern "C"
+void call_onclick([[maybe_unused]] int x, [[maybe_unused]] int y) {
+	started = true;
 }
 
 } // namespace

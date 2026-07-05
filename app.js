@@ -77,9 +77,6 @@ window.onresize = function() {
 	document.querySelectorAll("td").forEach(data => {data.style.fontSize = bound/boxWidthFor1pxFont;});
 	document.querySelectorAll("tr").forEach(row => {row.style.lineHeight = bound/HEIGHT + "px";});
 };
-requestAnimationFrame(()=>{
-	window.onresize();
-});
 
 function cset(y, x, c) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
@@ -93,7 +90,6 @@ function cset(y, x, c) {
 	}
 	cells[y][x].textContent = c;
 }
-window.cset = cset;
 
 function bset(y, x, bg) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
@@ -103,7 +99,7 @@ function bset(y, x, bg) {
 		cells[y][x].style.background = PICO8_COLORS[bg]
 	}
 }
-window.bset = bset;
+
 function fset(y, x, fg) {
 	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
 		return;
@@ -112,79 +108,30 @@ function fset(y, x, fg) {
 		cells[y][x].style.color = PICO8_COLORS[fg]
 	}
 }
-window.fset = fset;
 
-function cls() {
-	for (let y = 0; y < HEIGHT; ++y) {
-		for (let x = 0; x < WIDTH; ++x) {
-			cset(y, x, ' ');
-			fset(y, x, 7);
-			bset(y, x, 0);
-		}
-	}
-}
-cls();
-for (let i = 0; i < 7; ++i) {
-	cset(5 + i, 10, '|');
-	fset(5 + i, 10, 1 + i);
-}
-for (let i = 0; i < 4; ++i) {
-	cset(5 + i, 13 + 3*i, '-');
-	fset(5 + i, 13 + 3*i, 8 + i);
-}
-for (let i = 0; i < 4; ++i) {
-	cset(11 - i, 13 + 3*i, '-');
-	fset(11 - i, 13 + 3*i, 14 - i);
-}
-cset(8, 13, 'P');
-fset(8, 13, 12);
-cset(8, 14, 'L');
-fset(8, 14, 13);
-cset(8, 15, 'A');
-fset(8, 15, 14);
-cset(8, 16, 'Y');
-fset(8, 16, 15);
-
-function print(y, x, msg) {
-	let i = 0;
-	for (c of msg) {
-		cset(y, x + i, c);
-		fset(y, x + i, 6);
-		++i;
-	}
-}
-print(14, 6, "controls: WASD, O, P");
-
-function processInput() {
+function processInput(callback) {
 	while (inp.value != '') {
 		const head = inp.value[0];
 		inp.value = inp.value.slice(1);
 		if (head == 'w' || head == 'W') {
-			window.call_onbutton(1);
+			callback(1);
 		}
 		else if (head == 's' || head == 'S') {
-			window.call_onbutton(2);
+			callback(2);
 		}
 		else if (head == 'a' || head == 'A') {
-			window.call_onbutton(3);
+			callback(3);
 		}
 		else if (head == 'd' || head == 'D') {
-			window.call_onbutton(4);
+			callback(4);
 		}
 		else if (head == 'p' || head == 'P') {
-			window.call_onbutton(5);
+			callback(5);
 		}
 		else if (head == 'o' || head == 'O') {
-			window.call_onbutton(6);
+			callback(6);
 		}
 	}
-}
-
-function frameCallback() {
-	const FPS = 30;
-	processInput();
-	window.call_onframe();
-	setTimeout(frameCallback, 1000/FPS);
 }
 
 const audioCtx = new AudioContext();
@@ -207,7 +154,6 @@ function nset(ch, note) {
 	volume = Math.min(127, note);
 	osc[ch].frequency.value = (440 * (2 ** ((note - 69) / 12)));
 }
-window.nset = nset;
 
 function vset(ch, volume) {
 	volume = Math.max(0, volume);
@@ -219,28 +165,39 @@ function vset(ch, volume) {
 	}
 	gain[ch].gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
 }
-window.vset = vset;
+
+document.body.addEventListener("click", () => {
+	if (audioCtx.state === "suspended") {
+		audioCtx.resume();
+	}
+	for (let i = 0; i < CHANNELS; ++i) {
+		osc[i].start(audioCtx.currentTime);
+	}
+	window.addEventListener("visibilitychange", () => {
+		if (document.hidden) {
+			audioCtx.suspend();
+		} else {
+			audioCtx.resume();
+		}
+	});
+}, {once: true});
 
 const importObject = {env:{cset,bset,fset,nset,vset}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	window.call_onbutton = obj.instance.exports.call_onbutton;
-	window.call_onframe = obj.instance.exports.call_onframe;
 	obj.instance.exports.call_oninit();
+
+	inp.addEventListener("input", () => {
+		processInput(obj.instance.exports.call_onbutton);
+	});
+
 	document.body.addEventListener("click", () => {
-		cls();
-		frameCallback();
-		if (audioCtx.state === "suspended") {
-			audioCtx.resume();
-		}
-		for (let i = 0; i < CHANNELS; ++i) {
-			osc[i].start(audioCtx.currentTime);
-		}
-		window.addEventListener("visibilitychange", () => {
-			if (document.hidden) {
-				audioCtx.suspend();
-			} else {
-				audioCtx.resume();
-			}
-		});
-	}, {once: true});
+		obj.instance.exports.call_onclick(1,2);
+	});
+
+	const FPS = 30;
+	setInterval(obj.instance.exports.call_onframe, 1000/FPS);
+
+	requestAnimationFrame(()=>{
+		window.onresize();
+	});
 });
