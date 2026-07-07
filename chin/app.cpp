@@ -1,4 +1,4 @@
-#include "chr.c"
+#include "chr.hpp"
 
 #include "io.hpp"
 
