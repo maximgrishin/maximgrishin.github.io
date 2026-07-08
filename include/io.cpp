@@ -22,6 +22,10 @@ __attribute__((import_name("vset")))
 extern "C"
 void vset(int c, int v);
 
+__attribute__((import_name("focus")))
+extern "C"
+void focus();
+
 constexpr int HEIGHT = 16;
 constexpr int WIDTH = 32;
 constexpr int CHANNELS = 4;
@@ -127,6 +131,9 @@ extern "C"
 void onmouse(int y, int x, io::Mouse m) {
 	if (m == io::MouseDown) {
 		started = true;
+	}
+	if (m == io::MouseUp) {
+		focus();
 	}
 	if (mouseCallback) {
 		mouseCallback(y, x, m);

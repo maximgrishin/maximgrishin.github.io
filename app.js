@@ -36,9 +36,9 @@ const box = document.createElement("div");
 const inp = document.createElement("input");
 inp.style.position = "absolute";
 inp.style.top = 0;
-document.onclick = function() {
+function focus() {
 	inp.focus();
-};
+}
 inp.style.opacity = 0;
 box.appendChild(inp);
 
@@ -77,7 +77,7 @@ const boxWidthFor1pxFont = function() {
 
 window.onresize = function() {
 	const bound = Math.min(window.innerHeight, window.innerWidth);
-	document.querySelectorAll("td").forEach(data => {data.style.fontSize = bound/boxWidthFor1pxFont;});
+	document.querySelectorAll("td").forEach(data => {data.style.fontSize = bound/boxWidthFor1pxFont + "px";});
 	document.querySelectorAll("tr").forEach(row => {row.style.lineHeight = bound/HEIGHT + "px";});
 };
 
@@ -169,7 +169,8 @@ function vset(ch, volume) {
 	gain[ch].gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
 }
 
-document.body.addEventListener("click", () => {
+let audioStarted = false;
+function startAudio() {
 	if (audioCtx.state === "suspended") {
 		audioCtx.resume();
 	}
@@ -183,9 +184,37 @@ document.body.addEventListener("click", () => {
 			audioCtx.resume();
 		}
 	});
-}, {once: true});
+	audioStarted = true;
+}
 
-const importObject = {env:{cset,bset,fset,nset,vset}};
+let lastTouchY = 0;
+let lastTouchX = 0;
+function handleMouse(type, pageY, pageX, callback) {
+	if (!audioStarted && type == 1) {
+		startAudio();
+	}
+	const element = document.elementFromPoint(pageX, pageY);
+	if (element.y == undefined) {
+		return;
+	}
+	const y = element.y;
+	const x = element.x;
+	if (event.type == 2 && y == lastTouchY && x == lastTouchX) {
+		return;
+	}
+	callback(y, x, type);
+	lastTouchY = y;
+	lastTouchX = x;
+}
+
+const importObject = {env: {
+	cset,
+	bset,
+	fset,
+	nset,
+	vset,
+	focus,
+}};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
 	obj.instance.exports.oninit();
 
@@ -193,38 +222,30 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 		processInput(obj.instance.exports.onbutton);
 	});
 
-	let lastTouchY = 0;
-	let lastTouchX = 0;
-	function handleTouch(event) {
-		for (const changedTouch of event.changedTouches) {
-			const element = document.elementFromPoint(changedTouch.pageX, changedTouch.pageY);
-			if (element.x != undefined) {
-				const y = element.y;
-				const x = element.x;
-				if (y != lastTouchY || x != lastTouchX || event.type != "touchmove") {
-					if (event.type == "touchstart") {
-						obj.instance.exports.onmouse(y, x, 1);
-					}
-					else if (event.type == "touchmove") {
-						obj.instance.exports.onmouse(y, x, 2);
-					}
-					else if (event.type == "touchend") {
-						obj.instance.exports.onmouse(y, x, 3);
-					}
-					lastTouchY = y;
-					lastTouchX = x;
-				}
-			}
-		}
-	}
-	document.body.addEventListener("touchstart", handleTouch);
-	document.body.addEventListener("touchmove", handleTouch);
-	document.body.addEventListener("touchend", handleTouch);
+	const mouseCallback = obj.instance.exports.onmouse;
+	document.body.addEventListener("mousedown", (event) => {
+		handleMouse(1, event.pageY, event.pageX, mouseCallback);
+	});
+	document.body.addEventListener("mousemove", (event) => {
+		handleMouse(2, event.pageY, event.pageX, mouseCallback);
+	});
+	document.body.addEventListener("mouseup", (event) => {
+		handleMouse(3, event.pageY, event.pageX, mouseCallback);
+	});
+	document.body.addEventListener("touchstart", (event) => {
+		handleMouse(1, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+	});
+	document.body.addEventListener("touchmove", (event) => {
+		handleMouse(2, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+	});
+	document.body.addEventListener("touchend", (event) => {
+		handleMouse(3, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+	});
 
 	const FPS = 30;
 	setInterval(obj.instance.exports.onframe, 1000/FPS);
 
-	requestAnimationFrame(()=>{
+	requestAnimationFrame(() => {
 		window.onresize();
 	});
 });
