@@ -118,11 +118,28 @@ void onframe() {
 	}
 }
 
-__attribute__((export_name("onbutton")))
+__attribute__((export_name("onchar")))
 extern "C"
-void onbutton(io::Button b) {
+void onchar(int c) {
 	if (buttonCallback) {
-		buttonCallback(b);
+		if (c == 'w' || c == 'W') {
+			buttonCallback(io::Up);
+		}
+		if (c == 's' || c == 'S') {
+			buttonCallback(io::Down);
+		}
+		if (c == 'a' || c == 'A') {
+			buttonCallback(io::Left);
+		}
+		if (c == 'd' || c == 'D') {
+			buttonCallback(io::Right);
+		}
+		if (c == 'p' || c == 'P') {
+			buttonCallback(io::ButtonA);
+		}
+		if (c == 'o' || c == 'O') {
+			buttonCallback(io::ButtonB);
+		}
 	}
 }
 

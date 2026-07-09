@@ -114,26 +114,8 @@ function fset(x, y, fg) {
 
 function processInput(callback) {
 	while (inp.value != '') {
-		const head = inp.value[0];
+		callback(inp.value.charCodeAt(0));
 		inp.value = inp.value.slice(1);
-		if (head == 'w' || head == 'W') {
-			callback(1);
-		}
-		else if (head == 's' || head == 'S') {
-			callback(2);
-		}
-		else if (head == 'a' || head == 'A') {
-			callback(3);
-		}
-		else if (head == 'd' || head == 'D') {
-			callback(4);
-		}
-		else if (head == 'p' || head == 'P') {
-			callback(5);
-		}
-		else if (head == 'o' || head == 'O') {
-			callback(6);
-		}
 	}
 }
 
@@ -219,7 +201,7 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 	obj.instance.exports.oninit();
 
 	inp.addEventListener("input", () => {
-		processInput(obj.instance.exports.onbutton);
+		processInput(obj.instance.exports.onchar);
 	});
 
 	const mouseCallback = obj.instance.exports.onmouse;
