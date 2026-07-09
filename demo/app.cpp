@@ -12,22 +12,46 @@ int j = 0;
 int fy = 3;
 int explosion = 0;
 
-void onbutton(io::Button b) {
-	if (b == io::Up) {
-		y -= 1;
+bool move;
+int targetX;
+int targetY;
+int moveFuse;
+
+void onmouse(int x, int y, io::Mouse m) {
+	if (m == io::MouseDown) {
+		move = true;
 	}
-	if (b == io::Down) {
-		y += 1;
+	if (m == io::MouseUp) {
+		move = false;
 	}
-	if (b == io::Left) {
-		x -= 1;
-	}
-	if (b == io::Right) {
-		x += 1;
+	if (m == io::MouseMove) {
+		targetX = x;
+		targetY = y;
 	}
 }
 
 void onframe() {
+	if (move) {
+		--moveFuse;
+		if (moveFuse <= 0) {
+			moveFuse = 4;
+			if (targetY < y) {
+				--y;
+			}
+			if (y < targetY) {
+				++y;
+			}
+		}
+		if (moveFuse == 2 || moveFuse == 4) {
+			if (targetX < x) {
+				--x;
+			}
+			if (x < targetX) {
+				++x;
+			}
+		}
+	}
+
 	if (y == 8 && 8 <= x && x <= 10) {
 		io::sfx(io::Sine, 60+x-8, x-7);
 		io::sfx(io::Triangle, 64+x-8, x-7);
@@ -95,5 +119,5 @@ void onframe() {
 
 void init() {
 	io::onframe(onframe);
-	io::onbutton(onbutton);
+	io::onmouse(onmouse);
 }

@@ -215,13 +215,17 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 		handleMouse(event.pageX, event.pageY, 3, mouseCallback);
 	});
 	document.body.addEventListener("touchstart", (event) => {
-		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 1, mouseCallback);
+		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
 	});
 	document.body.addEventListener("touchmove", (event) => {
-		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 2, mouseCallback);
+		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
 	});
 	document.body.addEventListener("touchend", (event) => {
-		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 3, mouseCallback);
+		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
+	});
+	document.body.addEventListener("touchcancel", (event) => {
+		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
 	});
 
 	const FPS = 30;
