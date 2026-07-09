@@ -8,8 +8,8 @@ int x;
 int y = 12;
 
 void pset(int y, int x, int col) {
-	io::cset(y+1, 2*x+5, ' ', io::Black, col);
-	io::cset(y+1, 2*x+6, ' ', io::Black, col);
+	io::cset(2*x+5, y+1, ' ', io::Black, col);
+	io::cset(2*x+6, y+1, ' ', io::Black, col);
 }
 
 constexpr int SIDE = 11;
@@ -125,9 +125,9 @@ bool in_canvas() {
 	return 0 <= x && x < SIDE && 0 <= y && y < SIDE;
 }
 
-void handleExamPress(int y, int x) {
+void handleExamPress(int x, int y) {
 	Dot& d = chars[ch].strokes[stroke][dot];
-	if (y == d.y - 1 && x == d.x - 1) {
+	if (x == d.x - 1 && y == d.y - 1) {
 		dd();
 		if (!isdot()) {
 			dd();
@@ -189,7 +189,7 @@ void onbutton(io::Button b) {
 			canvas[y][x] = true;
 		}
 		else if (mode == Exam && !blink_fuse && !victory_fuse) {
-			handleExamPress(y, x);
+			handleExamPress(x, y);
 		}
 	}
 	if (b == io::ButtonB && in_canvas()) {
@@ -228,7 +228,7 @@ int animation_fuse = 2*animation_tick;
 
 void print(int y, int x, char const *str) {
 	for (int i = 0; str[i] != 0 && x + i < 32; ++i) {
-		io::cset(y, x + i, str[i]);
+		io::cset(x + i, y, str[i]);
 	}
 }
 
@@ -296,22 +296,22 @@ void onframe() {
 		print(13, 8, "char: ");
 		print(13, 14, chars[ch].name);
 		print(14, 8, "U+");
-		io::cset(14, 8, 'U', io::DarkGray);
-		io::cset(14, 9, '+', io::DarkGray);
-		io::cset(14, 10, hex[up%0x10000/0x1000], io::DarkGray);
-		io::cset(14, 11, hex[up%0x1000/0x100], io::DarkGray);
-		io::cset(14, 12, hex[up%0x100/0x10], io::DarkGray);
-		io::cset(14, 13, hex[up%0x10], io::DarkGray);
+		io::cset(8, 14, 'U', io::DarkGray);
+		io::cset(9, 14, '+', io::DarkGray);
+		io::cset(10, 14, hex[up%0x10000/0x1000], io::DarkGray);
+		io::cset(11, 14, hex[up%0x1000/0x100], io::DarkGray);
+		io::cset(12, 14, hex[up%0x100/0x10], io::DarkGray);
+		io::cset(13, 14, hex[up%0x10], io::DarkGray);
 	}
 	if (in_canvas() && mode == Free) {
-		io::cset(13, 8, 'y', io::DarkGray);
-		io::cset(13, 9, ':', io::DarkGray);
-		io::cset(13, 11, '0' + (y+1)/10, io::DarkGray);
-		io::cset(13, 12, '0' + (y+1)%10, io::DarkGray);
-		io::cset(14, 8, 'x', io::DarkGray);
-		io::cset(14, 9, ':', io::DarkGray);
-		io::cset(14, 11, '0' + (x+1)/10, io::DarkGray);
-		io::cset(14, 12, '0' + (x+1)%10, io::DarkGray);
+		io::cset(8, 13, 'y', io::DarkGray);
+		io::cset(9, 13, ':', io::DarkGray);
+		io::cset(11, 13, '0' + (y+1)/10, io::DarkGray);
+		io::cset(12, 13, '0' + (y+1)%10, io::DarkGray);
+		io::cset(8, 14, 'x', io::DarkGray);
+		io::cset(9, 14, ':', io::DarkGray);
+		io::cset(11, 14, '0' + (x+1)/10, io::DarkGray);
+		io::cset(12, 14, '0' + (x+1)%10, io::DarkGray);
 	}
 }
 
@@ -334,12 +334,12 @@ int fromXToCanvasX(int x) {
 
 bool mouseDown;
 bool freeModePaintValue;
-int lastMouseY;
 int lastMouseX;
-void onmouse(int y, int x, io::Mouse m) {
-	y = fromYToCanvasY(y);
+int lastMouseY;
+void onmouse(int x, int y, io::Mouse m) {
 	x = fromXToCanvasX(x);
-	if (y == -1 || x == -1) {
+	y = fromYToCanvasY(y);
+	if (x == -1 || y == -1) {
 		return;
 	}
 	if (m == io::MouseDown) {
@@ -357,10 +357,10 @@ void onmouse(int y, int x, io::Mouse m) {
 				canvas[y][x] = freeModePaintValue;
 			}
 			else if (mode == Exam) {
-				handleExamPress(y, x);
+				handleExamPress(x, y);
 			}
-			lastMouseY = y;
 			lastMouseX = x;
+			lastMouseY = y;
 		}
 	}
 }

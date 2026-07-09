@@ -81,8 +81,8 @@ window.onresize = function() {
 	document.querySelectorAll("tr").forEach(row => {row.style.lineHeight = bound/HEIGHT + "px";});
 };
 
-function cset(y, x, c) {
-	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
+function cset(x, y, c) {
+	if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {
 		return;
 	}
 	if (typeof(c) == typeof(0)) {
@@ -94,8 +94,8 @@ function cset(y, x, c) {
 	cells[y][x].textContent = c;
 }
 
-function bset(y, x, bg) {
-	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
+function bset(x, y, bg) {
+	if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {
 		return;
 	}
 	if (0 <= bg && bg < PICO8_COLORS.length) {
@@ -103,8 +103,8 @@ function bset(y, x, bg) {
 	}
 }
 
-function fset(y, x, fg) {
-	if (y < 0 || HEIGHT <= y || x < 0 || WIDTH <= x) {
+function fset(x, y, fg) {
+	if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {
 		return;
 	}
 	if (0 <= fg && fg < PICO8_COLORS.length) {
@@ -187,24 +187,24 @@ function startAudio() {
 	audioStarted = true;
 }
 
-let lastTouchY = 0;
 let lastTouchX = 0;
-function handleMouse(type, pageY, pageX, callback) {
+let lastTouchY = 0;
+function handleMouse(pageX, pageY, type, callback) {
 	if (!audioStarted && type == 1) {
 		startAudio();
 	}
 	const element = document.elementFromPoint(pageX, pageY);
-	if (element.y == undefined) {
+	if (element.x == undefined) {
 		return;
 	}
-	const y = element.y;
 	const x = element.x;
-	if (event.type == 2 && y == lastTouchY && x == lastTouchX) {
+	const y = element.y;
+	if (x == lastTouchX && y == lastTouchY && event.type == 2) {
 		return;
 	}
-	callback(y, x, type);
-	lastTouchY = y;
+	callback(x, y, type);
 	lastTouchX = x;
+	lastTouchY = y;
 }
 
 const importObject = {env: {
@@ -224,22 +224,22 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 
 	const mouseCallback = obj.instance.exports.onmouse;
 	document.body.addEventListener("mousedown", (event) => {
-		handleMouse(1, event.pageY, event.pageX, mouseCallback);
+		handleMouse(event.pageX, event.pageY, 1, mouseCallback);
 	});
 	document.body.addEventListener("mousemove", (event) => {
-		handleMouse(2, event.pageY, event.pageX, mouseCallback);
+		handleMouse(event.pageX, event.pageY, 2, mouseCallback);
 	});
 	document.body.addEventListener("mouseup", (event) => {
-		handleMouse(3, event.pageY, event.pageX, mouseCallback);
+		handleMouse(event.pageX, event.pageY, 3, mouseCallback);
 	});
 	document.body.addEventListener("touchstart", (event) => {
-		handleMouse(1, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 1, mouseCallback);
 	});
 	document.body.addEventListener("touchmove", (event) => {
-		handleMouse(2, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 2, mouseCallback);
 	});
 	document.body.addEventListener("touchend", (event) => {
-		handleMouse(3, event.touches[0].pageY, event.touches[0].pageX, mouseCallback);
+		handleMouse(event.touches[0].pageX, event.touches[0].pageY, 3, mouseCallback);
 	});
 
 	const FPS = 30;

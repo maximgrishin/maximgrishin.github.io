@@ -34,8 +34,8 @@ void onframe() {
 	}
 	io::cls();
 	io::cset(8,8,' ',9,9);
-	io::cset(8,9,' ',9,9);
-	io::cset(8,10,' ',9,9);
+	io::cset(9,8,' ',9,9);
+	io::cset(10,8,' ',9,9);
 	bool in = x == 1 && y == 1;
 	ii += 1;
 	if (!in) {
@@ -53,33 +53,33 @@ void onframe() {
 		int ns[] {61,63,66,68,70,68,66,63};
 		io::sfx(io::Sawtooth, ns[i], io::Forte);
 	}
-	io::cset(ys[i], xs[i], 'U', 8, 1);
+	io::cset(xs[i], ys[i], 'U', 8, 1);
 	if (explosion == 0 && y == fy && x == j) {
 		explosion = 1;
 	}
 	if (explosion == 0) {
 		++j;
 		j %= 32;
-		io::cset(fy, j, 'X', 10, 0);
+		io::cset(j, fy, 'X', 10, 0);
 	} else {
 		if (explosion <= 2) {
-			io::cset(fy, j+1, '/', 10, 0);
-			io::cset(fy, j-1, '/', 10, 0);
-			io::cset(fy+1, j, '.', 10, 0);
+			io::cset(j+1, fy, '/', 10, 0);
+			io::cset(j-1, fy, '/', 10, 0);
+			io::cset(j, fy+1, '.', 10, 0);
 				++explosion;
 			io::sfx(io::Square, 84, io::Forte);
 			}
 		else if (explosion <= 4) {
-			io::cset(fy, j+2, '-', 10, 0);
-			io::cset(fy, j-2, '/', 10, 0);
-			io::cset(fy+2,j+1,'|', 10, 0);
+			io::cset(j+2,fy,  '-', 10, 0);
+			io::cset(j-2,fy,  '/', 10, 0);
+			io::cset(j+1,fy+2,'|', 10, 0);
 				++explosion;
 			io::sfx(io::Square, 82, io::Forte);
 			}
 		else if (explosion <= 6) {
-			io::cset(fy-2,j+2,'/', 10, 0);
-			io::cset(fy, j-3, '.', 10, 0);
-			io::cset(fy+3,j+1,'.', 10, 0);
+			io::cset(j+2,fy-2,'/', 10, 0);
+			io::cset(j-3,fy,  '.', 10, 0);
+			io::cset(j+1,fy+3,'.', 10, 0);
 				++explosion;
 			io::sfx(io::Square, 80, io::Forte);
 			}
@@ -90,7 +90,7 @@ void onframe() {
 			explosion = 0;
 		}
 	}
-	io::cset(y, x, 'B', io::Blue, io::Green);
+	io::cset(x, y, 'B', io::Blue, io::Green);
 }
 
 void init() {

@@ -51,7 +51,7 @@ enum Mouse {
 	MouseUp,
 };
 
-void cset(int y, int x, int character, int foreground = Colors, int background = Colors);
+void cset(int x, int y, int character, int foreground = Colors, int background = Colors);
 void cls();
 void sfx(int channel, int note, int volume);
 
