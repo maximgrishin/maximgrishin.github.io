@@ -35,16 +35,6 @@ enum {
 	Forte,
 };
 
-enum Button {
-	NoInput,
-	Up,
-	Down,
-	Left,
-	Right,
-	ButtonA,
-	ButtonB,
-};
-
 enum Mouse {
 	MouseDown = 1,
 	MouseMove,

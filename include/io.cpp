@@ -73,23 +73,11 @@ void flip() {
 	}
 }
 
-void print(int x, int y, char const *msg) {
-	int i = 0;
-	while (msg[i] != 0) {
-		io::cset(x + i, y, msg[i], 6);
-		++i;
-	}
-}
-
 void (*frameCallback)();
 void (*charCallback)(int);
 void (*mouseCallback)(int, int, io::Mouse);
 
-bool started = false;
-
-__attribute__((export_name("oninit")))
-extern "C"
-void oninit() {
+void splash() {
 	io::cls();
 	for (int i = 0; i < 7; ++i) {
 		io::cset(10, 5 + i, '|', 1 + i);
@@ -104,7 +92,13 @@ void oninit() {
 	io::cset(14, 8, 'L', 13);
 	io::cset(15, 8, 'A', 14);
 	io::cset(16, 8, 'Y', 15);
-	print(6, 14, "controls: WASD, O, P");
+}
+
+__attribute__((export_name("oninit")))
+extern "C"
+void oninit() {
+	splash();
+	flip();
 	init();
 	flip();
 }
@@ -112,7 +106,7 @@ void oninit() {
 __attribute__((export_name("onframe")))
 extern "C"
 void onframe() {
-	if (frameCallback && started) {
+	if (frameCallback) {
 		frameCallback();
 		flip();
 	}
@@ -129,12 +123,6 @@ void onchar(int c) {
 __attribute__((export_name("onmouse")))
 extern "C"
 void onmouse(int x, int y, io::Mouse m) {
-	if (m == io::MouseDown) {
-		started = true;
-	}
-	if (m == io::MouseUp) {
-		focus();
-	}
 	if (mouseCallback) {
 		mouseCallback(x, y, m);
 	}
@@ -143,6 +131,10 @@ void onmouse(int x, int y, io::Mouse m) {
 } // namespace
 
 namespace io {
+
+void focus() {
+	::focus();
+}
 
 void cset(int x, int y, int character, int foreground, int background) {
 	if (x < 0 || WIDTH <= x || y < 0 || HEIGHT <= y) {

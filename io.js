@@ -30,6 +30,7 @@ document.body.style.height = "100%";
 document.querySelector("html").style.overflow = "hidden";
 document.body.style.overflow = "hidden";
 document.body.style.userSelect = "none";
+document.body.style.touchAction = "none";
 
 const box = document.createElement("div");
 
@@ -119,19 +120,37 @@ function processInput(callback) {
 	}
 }
 
-const audioCtx = new AudioContext();
+let audioCtx;
 const types = ["sine", "square", "triangle", "sawtooth"];
 const CHANNELS = types.length;
 const shares = [3/8, 1/8, 3/8, 1/8];
 const osc = [];
 const gain = [];
-for (let i = 0; i < CHANNELS; ++i) {
-	osc.push(new OscillatorNode(audioCtx, {
-	type: types[i],
-	frequency: 440,
-}));
-	gain.push(new GainNode(audioCtx, {"gain":0.0001}));
-	osc[i].connect(gain[i]).connect(audioCtx.destination);
+
+function createAudioCtx() {
+	audioCtx = new AudioContext();
+	for (let i = 0; i < CHANNELS; ++i) {
+		osc.push(new OscillatorNode(audioCtx, {
+		type: types[i],
+		frequency: 440,
+	}));
+		gain.push(new GainNode(audioCtx, {"gain":0.0001}));
+		osc[i].connect(gain[i]).connect(audioCtx.destination);
+	}
+
+	if (audioCtx.state === "suspended") {
+		audioCtx.resume();
+	}
+	for (let i = 0; i < CHANNELS; ++i) {
+		osc[i].start(audioCtx.currentTime);
+	}
+	window.addEventListener("visibilitychange", () => {
+		if (document.hidden) {
+			audioCtx.suspend();
+		} else {
+			audioCtx.resume();
+		}
+	});
 }
 
 function nset(ch, note) {
@@ -151,42 +170,21 @@ function vset(ch, volume) {
 	gain[ch].gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.01);
 }
 
-let audioStarted = false;
-function startAudio() {
-	if (audioCtx.state === "suspended") {
-		audioCtx.resume();
-	}
-	for (let i = 0; i < CHANNELS; ++i) {
-		osc[i].start(audioCtx.currentTime);
-	}
-	window.addEventListener("visibilitychange", () => {
-		if (document.hidden) {
-			audioCtx.suspend();
-		} else {
-			audioCtx.resume();
-		}
-	});
-	audioStarted = true;
-}
-
-let lastTouchX = 0;
-let lastTouchY = 0;
+let lastX = 0;
+let lastY = 0;
 function handleMouse(pageX, pageY, type, callback) {
-	if (!audioStarted && type == 1) {
-		startAudio();
-	}
 	const element = document.elementFromPoint(pageX, pageY);
 	if (element.x == undefined) {
 		return;
 	}
 	const x = element.x;
 	const y = element.y;
-	if (x == lastTouchX && y == lastTouchY && event.type == 2) {
+	if (x == lastX && y == lastY && event.type == 2) {
 		return;
 	}
 	callback(x, y, type);
-	lastTouchX = x;
-	lastTouchY = y;
+	lastX = x;
+	lastY = y;
 }
 
 const importObject = {env: {
@@ -198,44 +196,48 @@ const importObject = {env: {
 	focus,
 }};
 WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((obj) => {
-	obj.instance.exports.oninit();
-
-	inp.addEventListener("input", () => {
-		processInput(obj.instance.exports.onchar);
-	});
-
-	const mouseCallback = obj.instance.exports.onmouse;
-	document.body.addEventListener("mousedown", (event) => {
-		handleMouse(event.pageX, event.pageY, 1, mouseCallback);
-	});
-	document.body.addEventListener("mousemove", (event) => {
-		handleMouse(event.pageX, event.pageY, 2, mouseCallback);
-	});
-	document.body.addEventListener("mouseup", (event) => {
-		handleMouse(event.pageX, event.pageY, 3, mouseCallback);
-	});
-	document.body.addEventListener("touchstart", (event) => {
-		event.preventDefault();
-		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
-		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
-	});
-	document.body.addEventListener("touchmove", (event) => {
-		event.preventDefault();
-		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
-	});
-	document.body.addEventListener("touchend", (event) => {
-		event.preventDefault();
-		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
-	});
-	document.body.addEventListener("touchcancel", (event) => {
-		event.preventDefault();
-		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
-	});
-
-	const FPS = 30;
-	setInterval(obj.instance.exports.onframe, 1000/FPS);
-
 	requestAnimationFrame(() => {
 		window.onresize();
 	});
+
+	obj.instance.exports.oninit();
+
+	document.body.addEventListener("click", () => {
+		createAudioCtx();
+
+		inp.addEventListener("input", () => {
+			processInput(obj.instance.exports.onchar);
+		});
+
+		const mouseCallback = obj.instance.exports.onmouse;
+		document.body.addEventListener("mousedown", (event) => {
+			handleMouse(event.pageX, event.pageY, 1, mouseCallback);
+		});
+		document.body.addEventListener("mousemove", (event) => {
+			handleMouse(event.pageX, event.pageY, 2, mouseCallback);
+		});
+		document.body.addEventListener("mouseup", (event) => {
+			handleMouse(event.pageX, event.pageY, 3, mouseCallback);
+		});
+		document.body.addEventListener("touchstart", (event) => {
+			event.preventDefault();
+			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
+		}, {passive: false});
+		document.body.addEventListener("touchmove", (event) => {
+			event.preventDefault();
+			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+		}, {passive: false});
+		document.body.addEventListener("touchend", (event) => {
+			event.preventDefault();
+			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
+		}, {passive: false});
+		document.body.addEventListener("touchcancel", (event) => {
+			event.preventDefault();
+			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
+		}, {passive: false});
+
+		const FPS = 30;
+		setInterval(obj.instance.exports.onframe, 1000/FPS);
+	}, {once: true});
 });
