@@ -93,7 +93,7 @@ void onframe() {
 	io::cset(y, x, 'B', io::Blue, io::Green);
 }
 
-void io::init() {
-	io::onframe(::onframe);
-	io::onbutton(::onbutton);
+void init() {
+	io::onframe(onframe);
+	io::onbutton(onbutton);
 }

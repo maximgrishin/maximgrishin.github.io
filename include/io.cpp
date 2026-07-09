@@ -105,7 +105,7 @@ void oninit() {
 	io::cset(8, 15, 'A', 14);
 	io::cset(8, 16, 'Y', 15);
 	print(14, 6, "controls: WASD, O, P");
-	io::init();
+	init();
 	flip();
 }
 
@@ -186,5 +186,4 @@ void onmouse(void (*func)(int, int, Mouse)) {
 	mouseCallback = func;
 }
 
-extern "C++" void init();
 } // namespace io

@@ -298,10 +298,10 @@ void onframe() {
 		print(14, 8, "U+");
 		io::cset(14, 8, 'U', io::DarkGray);
 		io::cset(14, 9, '+', io::DarkGray);
-		io::cset(14, 10, hex[up%65536/4096], io::DarkGray);
-		io::cset(14, 11, hex[up%4096/256], io::DarkGray);
-		io::cset(14, 12, hex[up%256/16], io::DarkGray);
-		io::cset(14, 13, hex[up%16], io::DarkGray);
+		io::cset(14, 10, hex[up%0x10000/0x1000], io::DarkGray);
+		io::cset(14, 11, hex[up%0x1000/0x100], io::DarkGray);
+		io::cset(14, 12, hex[up%0x100/0x10], io::DarkGray);
+		io::cset(14, 13, hex[up%0x10], io::DarkGray);
 	}
 	if (in_canvas() && mode == Free) {
 		io::cset(13, 8, 'y', io::DarkGray);
@@ -365,8 +365,8 @@ void onmouse(int y, int x, io::Mouse m) {
 	}
 }
 
-void io::init() {
-	io::onframe(::onframe);
-	io::onbutton(::onbutton);
-	io::onmouse(::onmouse);
+void init() {
+	io::onframe(onframe);
+	io::onbutton(onbutton);
+	io::onmouse(onmouse);
 }

@@ -59,6 +59,6 @@ void onframe(void (*func)());
 void onbutton(void (*func)(Button));
 void onmouse(void (*func)(int, int, Mouse));
 
-extern "C++" void init();
-
 }
+
+void init();

@@ -197,6 +197,6 @@ void onframe() {
 	io::cset(15,27,' ',4,4);
 }
 
-void io::init() {
-	io::onframe(::onframe);
+void init() {
+	io::onframe(onframe);
 }
