@@ -56,7 +56,7 @@ void cls();
 void sfx(int channel, int note, int volume);
 
 void onframe(void (*func)());
-void onbutton(void (*func)(Button));
+void onchar(void (*func)(int));
 void onmouse(void (*func)(int, int, Mouse));
 
 }

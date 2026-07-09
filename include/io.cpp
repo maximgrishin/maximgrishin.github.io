@@ -82,7 +82,7 @@ void print(int x, int y, char const *msg) {
 }
 
 void (*frameCallback)();
-void (*buttonCallback)(io::Button);
+void (*charCallback)(int);
 void (*mouseCallback)(int, int, io::Mouse);
 
 bool started = false;
@@ -121,25 +121,8 @@ void onframe() {
 __attribute__((export_name("onchar")))
 extern "C"
 void onchar(int c) {
-	if (buttonCallback) {
-		if (c == 'w' || c == 'W') {
-			buttonCallback(io::Up);
-		}
-		if (c == 's' || c == 'S') {
-			buttonCallback(io::Down);
-		}
-		if (c == 'a' || c == 'A') {
-			buttonCallback(io::Left);
-		}
-		if (c == 'd' || c == 'D') {
-			buttonCallback(io::Right);
-		}
-		if (c == 'p' || c == 'P') {
-			buttonCallback(io::ButtonA);
-		}
-		if (c == 'o' || c == 'O') {
-			buttonCallback(io::ButtonB);
-		}
+	if (charCallback) {
+		charCallback(c);
 	}
 }
 
@@ -195,8 +178,8 @@ void onframe(void (*func)()) {
 	frameCallback = func;
 }
 
-void onbutton(void (*func)(Button)) {
-	buttonCallback = func;
+void onchar(void (*func)(int)) {
+	charCallback = func;
 }
 
 void onmouse(void (*func)(int, int, Mouse)) {

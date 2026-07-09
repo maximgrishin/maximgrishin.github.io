@@ -4,9 +4,6 @@
 
 constexpr int animation_tick = 2;
 
-int x;
-int y = 12;
-
 void pset(int y, int x, int col) {
 	io::cset(2*x+5, y+1, ' ', io::Black, col);
 	io::cset(2*x+6, y+1, ' ', io::Black, col);
@@ -121,10 +118,6 @@ void nextmode() {
 	}
 }
 
-bool in_canvas() {
-	return 0 <= x && x < SIDE && 0 <= y && y < SIDE;
-}
-
 void handleExamPress(int x, int y) {
 	Dot& d = chars[ch].strokes[stroke][dot];
 	if (x == d.x - 1 && y == d.y - 1) {
@@ -137,66 +130,6 @@ void handleExamPress(int x, int y) {
 				blink_fuse = 4*animation_tick-1;
 				victory_fuse = 4*animation_tick-1;
 			}
-		}
-	}
-}
-
-void onbutton(io::Button b) {
-	if (b == io::Up) {
-		if ((mode == Demo && y == 12) || (mode != Demo && y > 0)) {
-			y -= 1;
-		}
-	}
-	if (b == io::Down) {
-		if (y < SIDE - 1) {
-			y += 1;
-		}
-		else if (y == SIDE - 1 && mode == Free) {
-			y += 1;
-		}
-		else if (y == SIDE && mode != Free) {
-			y += 1;
-		}
-	}
-	if (b == io::Left) {
-		if (in_canvas() && x > 0) {
-			x -= 1;
-		}
-		else {
-			if (y == SIDE) {
-				prevmode();
-			}
-			if (y == SIDE + 1) {
-				prevch();
-			}
-		}
-	}
-	if (b == io::Right) {
-		if (in_canvas() && x < SIDE - 1) {
-			x += 1;
-		}
-		else {
-			if (y == SIDE) {
-				nextmode();
-			}
-			if (y == SIDE + 1) {
-				nextch();
-			}
-		}
-	}
-	if (b == io::ButtonA && in_canvas()) {
-		if (mode == Free) {
-			canvas[y][x] = true;
-		}
-		else if (mode == Exam && !blink_fuse && !victory_fuse) {
-			handleExamPress(x, y);
-		}
-	}
-	if (b == io::ButtonB && in_canvas()) {
-		if (mode == Free) {
-			canvas[y][x] = false;
-		} else if (mode == Exam) {
-			y = 11;
 		}
 	}
 }
@@ -232,6 +165,9 @@ void print(int y, int x, char const *str) {
 	}
 }
 
+int lastMouseX;
+int lastMouseY;
+
 void onframe() {
 	io::cls();
 	draw_grid();
@@ -260,24 +196,9 @@ void onframe() {
 				copy_canvas(done, stale);
 			}
 		}
-		if (in_canvas()) {
-			pset(y, x, io::Red);
-		}
 		draw_canvas(done, io::Blue);
 		draw_canvas(stale, io::Blue + (blink_fuse ? 0 : victory_fuse/animation_tick));
 		draw_canvas(fresh, io::Green + blink_fuse/animation_tick);
-	}
-	if (in_canvas()) {
-		if (!blink_fuse && !victory_fuse) {
-			if ((mode != Free && (fresh[y][x] || stale[y][x])) || (mode == Free && canvas[y][x])) {
-				pset(y, x, io::Pink);
-			}
-			else {
-				pset(y, x, io::Red);
-			}
-		}
-	} else {
-		pset(y, 0, io::Red);
 	}
 	switch (mode) {
 	case Free:
@@ -303,15 +224,21 @@ void onframe() {
 		io::cset(12, 14, hex[up%0x100/0x10], io::DarkGray);
 		io::cset(13, 14, hex[up%0x10], io::DarkGray);
 	}
-	if (in_canvas() && mode == Free) {
+	if (mode == Free) {
 		io::cset(8, 13, 'y', io::DarkGray);
 		io::cset(9, 13, ':', io::DarkGray);
-		io::cset(11, 13, '0' + (y+1)/10, io::DarkGray);
-		io::cset(12, 13, '0' + (y+1)%10, io::DarkGray);
+		io::cset(11, 13, '0' + (lastMouseY+1)/10, io::DarkGray);
+		io::cset(12, 13, '0' + (lastMouseY+1)%10, io::DarkGray);
 		io::cset(8, 14, 'x', io::DarkGray);
 		io::cset(9, 14, ':', io::DarkGray);
-		io::cset(11, 14, '0' + (x+1)/10, io::DarkGray);
-		io::cset(12, 14, '0' + (x+1)%10, io::DarkGray);
+		io::cset(11, 14, '0' + (lastMouseX+1)/10, io::DarkGray);
+		io::cset(12, 14, '0' + (lastMouseX+1)%10, io::DarkGray);
+	}
+	io::cset(4, 12, '<', io::Red);
+	io::cset(6, 12, '>', io::Red);
+	if (mode != Free) {
+		io::cset(4, 13, '<', io::Red);
+		io::cset(6, 13, '>', io::Red);
 	}
 }
 
@@ -334,9 +261,25 @@ int fromXToCanvasX(int x) {
 
 bool mouseDown;
 bool freeModePaintValue;
-int lastMouseX;
-int lastMouseY;
 void onmouse(int x, int y, io::Mouse m) {
+	if (m == io::MouseDown) {
+		if (x == 4) {
+			if (y == 12) {
+				prevmode();
+			}
+			if (y == 13 && mode != Free) {
+				prevch();
+			}
+		}
+		if (x == 6) {
+			if (y == 12) {
+				nextmode();
+			}
+			if (y == 13 && mode != Free) {
+				nextch();
+			}
+		}
+	}
 	x = fromXToCanvasX(x);
 	y = fromYToCanvasY(y);
 	if (x == -1 || y == -1) {
@@ -352,21 +295,20 @@ void onmouse(int x, int y, io::Mouse m) {
 		mouseDown = false;
 	}
 	if (mouseDown) {
-		if (lastMouseX != x || lastMouseY != y) {
+		if (m != io::MouseMove || lastMouseX != x || lastMouseY != y) {
 			if (mode == Free) {
 				canvas[y][x] = freeModePaintValue;
 			}
-			else if (mode == Exam) {
+			else if (mode == Exam && !blink_fuse && !victory_fuse) {
 				handleExamPress(x, y);
 			}
-			lastMouseX = x;
-			lastMouseY = y;
 		}
 	}
+	lastMouseX = x;
+	lastMouseY = y;
 }
 
 void init() {
 	io::onframe(onframe);
-	io::onbutton(onbutton);
 	io::onmouse(onmouse);
 }

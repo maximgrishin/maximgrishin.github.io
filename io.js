@@ -215,16 +215,20 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 		handleMouse(event.pageX, event.pageY, 3, mouseCallback);
 	});
 	document.body.addEventListener("touchstart", (event) => {
+		event.preventDefault();
 		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
 		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
 	});
 	document.body.addEventListener("touchmove", (event) => {
+		event.preventDefault();
 		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
 	});
 	document.body.addEventListener("touchend", (event) => {
+		event.preventDefault();
 		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
 	});
 	document.body.addEventListener("touchcancel", (event) => {
+		event.preventDefault();
 		handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 3, mouseCallback);
 	});
 
