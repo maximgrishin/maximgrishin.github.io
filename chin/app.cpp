@@ -1,6 +1,6 @@
 #include "chr.hpp"
 
-#include "io.hpp"
+#include <io/io.hpp>
 
 constexpr int animation_tick = 2;
 
