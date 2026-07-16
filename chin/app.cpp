@@ -17,8 +17,7 @@ bool stale[SIDE][SIDE];
 bool done[SIDE][SIDE];
 
 int ch;
-int stroke;
-int dot;
+int strokedot = 1;
 
 int blink_fuse;
 int victory_fuse;
@@ -43,8 +42,7 @@ void copy_canvas(bool to[SIDE][SIDE], bool from[SIDE][SIDE]) {
 }
 
 void resetch() {
-	stroke = 0;
-	dot = 0;
+	strokedot = 1;
 	clear_canvas(fresh);
 	clear_canvas(stale);
 	clear_canvas(done);
@@ -64,30 +62,47 @@ void nextch() {
 	}
 }
 
+char getCurrentChar() {
+	return chars[ch].strokes[strokedot];
+}
+
+int getCurrentY() {
+	return getCurrentChar()-'0';
+}
+
+int getCurrentX() {
+	return chars[ch].strokes[strokedot + 1]-'0';
+}
+
+void plusplusdot() {
+	strokedot += 2;
+}
+
 bool isdot() {
-	return chars[ch].strokes[stroke][dot].x;
+	return '1' <= getCurrentChar() && getCurrentChar() <= ';';
 }
 
 bool nextdot() {
-	if (chars[ch].strokes[stroke][dot].x) {
-		++dot;
+	if (isdot()) {
+		plusplusdot();
 		return true;
 	}
 	return false;
 }
 
 bool nextstroke() {
-	if (chars[ch].strokes[stroke + 1]) {
-		++stroke;
-		dot = 0;
-		return true;
+	while (getCurrentChar() != 0) {
+		++strokedot;
+		if (isdot()) {
+			return true;
+		}
 	}
 	return false;
 }
 
 void dd() {
 	if (isdot()) {
-		fresh[chars[ch].strokes[stroke][dot].y - 1][chars[ch].strokes[stroke][dot].x - 1] = true;
+		fresh[getCurrentY() - 1][getCurrentX() - 1] = true;
 		nextdot();
 	}
 	else if (nextstroke()) {
@@ -118,8 +133,12 @@ void nextmode() {
 	}
 }
 
+Dot getCurrentDot() {
+	return {getCurrentY(), getCurrentX()};
+}
+
 void handleExamPress(int x, int y) {
-	Dot& d = chars[ch].strokes[stroke][dot];
+	Dot d = getCurrentDot();
 	if (x == d.x - 1 && y == d.y - 1) {
 		dd();
 		if (!isdot()) {

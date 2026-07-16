@@ -6,7 +6,7 @@ struct Dot {
 struct Chr {
 	int unicode_point;
 	char const *name;
-	Dot **strokes;
+	char const *strokes;
 };
 
 extern Chr chars[];
