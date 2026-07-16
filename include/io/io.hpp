@@ -2,7 +2,7 @@
 
 namespace io {
 
-enum {
+enum Color {
 	Black,
 	DarkBlue,
 	DarkPurple,
