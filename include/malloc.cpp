@@ -3,35 +3,64 @@ union BlockHeader {
     int bucketIdx;
 };
 
-constexpr int kNumLists = 28;
-constexpr int kSmallestBlockSize = 16;
-//constexpr int kLargestBlockSize = kSmallestBlockSize << (kNumLists - 1);
+namespace std {
+    typedef unsigned long size_t;
+}
+
+constexpr int kNumLists = 30;
+constexpr std::size_t kSmallestBlockSize = sizeof(BlockHeader);
+//constexpr std::size_t kLargestBlockSize = kSmallestBlockSize << (kNumLists - 1);
+
+extern unsigned char __heap_base;
 
 BlockHeader* listHeads[kNumLists];
-void* usedHeapEnd;
+BlockHeader* usedHeapEnd = (BlockHeader*)&__heap_base;
 
-void* malloc(int request) {
+void* malloc(std::size_t request) {
     request += sizeof(BlockHeader);
 
     int bucketIdx = 0;
-    for(int size = kSmallestBlockSize; size < request; size *= 2) {
+    for(std::size_t blockSize = kSmallestBlockSize; blockSize < request; blockSize *= 2) {
         ++bucketIdx;
     }
 
-    if (void* result = listHeads[bucketIdx]) {
+    BlockHeader* blockHeader = 0;
+    if (listHeads[bucketIdx]) {
+        blockHeader = listHeads[bucketIdx];
         listHeads[bucketIdx] = listHeads[bucketIdx]->next;
-        return result;
     }
     else {
-        result = ((BlockHeader*) usedHeapEnd) + 1;
-        ((BlockHeader*) usedHeapEnd)->bucketIdx = bucketIdx;
-        usedHeapEnd = (char*)usedHeapEnd + (kSmallestBlockSize << bucketIdx);
-        return result;
+        blockHeader = usedHeapEnd;
+        usedHeapEnd = usedHeapEnd + (1 << bucketIdx);
     }
+    blockHeader->bucketIdx = bucketIdx;
+    return blockHeader + 1;
 }
 
-void free(void* area) {
-    BlockHeader* block = ((BlockHeader*) area) - 1;
-    block->next = listHeads[block->bucketIdx];
-    listHeads[block->bucketIdx] = block;
+void free(void* blockArea) {
+    if (!blockArea) {
+        return;
+    }
+    BlockHeader* blockHeader = ((BlockHeader*) blockArea) - 1;
+    int bucketIdx = blockHeader->bucketIdx;
+    BlockHeader* oldListHead = listHeads[bucketIdx];
+
+    listHeads[bucketIdx] = blockHeader;
+    blockHeader->next = oldListHead;
+}
+
+void* operator new(std::size_t size) {
+    return malloc(size);
+}
+
+void* operator new[](std::size_t size) {
+    return malloc(size);
+}
+
+void operator delete(void* ptr, std::size_t) noexcept {
+    free(ptr);
+}
+
+void operator delete[](void* ptr) noexcept {
+    free(ptr);
 }
