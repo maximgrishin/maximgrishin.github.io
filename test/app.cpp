@@ -8,30 +8,30 @@ unsigned long testIdx;
 int testAlloc() {
     int failedAssertNum = 1;
     {
-        int* a = new int;
-        delete a;
-        int* b = new int;
+        void* a = operator new(4);
+        operator delete(a);
+        void* b = operator new(4);
         ASSERT(a == b);
-        delete b;
+        operator delete(b);
     }
     {
-        int* a = new int;
-        int* b = new int;
-        delete a;
-        delete b;
-        int* c = new int;
-        int* d = new int;
+        void* a = operator new(4);
+        void* b = operator new(4);
+        operator delete(a);
+        operator delete(b);
+        void* c = operator new(4);
+        void* d = operator new(4);
         ASSERT(a == d);
         ASSERT(b == c);
-        delete c;
-        delete d;
+        operator delete(c);
+        operator delete(d);
     }
     {
-        char *a = new char[16];
-        char *b = new char[32];
+        void *a = operator new[](16);
+        void *b = operator new[](32);
         ASSERT(a != b);
-        delete[] b;
-        delete[] a;
+        operator delete[](b);
+        operator delete[](a);
     }
     return 0;
 }
