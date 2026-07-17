@@ -28,7 +28,7 @@ void focus();
 
 constexpr int HEIGHT = 16;
 constexpr int WIDTH = 32;
-constexpr int CHANNELS = 4;
+constexpr int CHANNELS = 2;
 
 int cbuf[HEIGHT][WIDTH];
 int bbuf[HEIGHT][WIDTH];

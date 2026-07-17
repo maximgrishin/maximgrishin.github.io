@@ -121,9 +121,9 @@ function processInput(callback) {
 }
 
 let audioCtx;
-const types = ["square", "triangle"];
+const types = ["square", "square"];
 const CHANNELS = types.length;
-const shares = [1/4, 3/4];
+const shares = [1/2, 1/2];
 const osc = [];
 const gain = [];
 
@@ -131,9 +131,9 @@ function createAudioCtx() {
 	audioCtx = new AudioContext();
 	for (let i = 0; i < CHANNELS; ++i) {
 		osc.push(new OscillatorNode(audioCtx, {
-		type: types[i],
-		frequency: 440,
-	}));
+			type: types[i],
+			frequency: 440,
+		}));
 		gain.push(new GainNode(audioCtx, {"gain":0.0001}));
 		osc[i].connect(gain[i]).connect(audioCtx.destination);
 	}

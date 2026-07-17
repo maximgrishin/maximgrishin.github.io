@@ -2,8 +2,8 @@
 
 constexpr int speed = 2;
 
-constexpr io::Channel BassChannel = io::Square;
-constexpr io::Channel MelodyChannel = io::Triangle;
+constexpr io::Channel BassChannel = io::SquareOne;
+constexpr io::Channel MelodyChannel = io::SquareTwo;
 
 int transpose(int note, int shift) {
 	return note != 0 ? note + shift : 0;
