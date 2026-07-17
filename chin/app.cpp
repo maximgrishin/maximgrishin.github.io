@@ -4,12 +4,18 @@
 
 constexpr int animation_tick = 3;
 
-constexpr int TOP_MARGIN = 1;
-constexpr int LEFT_MARGIN = 9;
+constexpr int TOP_MARGIN = 0;
+constexpr int LEFT_MARGIN = 2;
 
-void pset(int y, int x, int col) {
-	io::cset(2*x+LEFT_MARGIN, y+TOP_MARGIN, ' ', io::Black, col);
-	io::cset(2*x+LEFT_MARGIN+1, y+TOP_MARGIN, ' ', io::Black, col);
+constexpr int CELL_WIDTH = 4;
+constexpr int CELL_HEIGHT = 2;
+
+void pset(int x, int y, int col) {
+	for (int i = 0; i < CELL_WIDTH; ++i) {
+		for (int j = 0; j < CELL_HEIGHT; ++j) {
+			io::cset(LEFT_MARGIN + x * CELL_WIDTH + i, TOP_MARGIN + y * CELL_HEIGHT + j, ' ', io::Black, col);
+		}
+	}
 }
 
 constexpr int SIDE = 7;
@@ -169,7 +175,7 @@ void draw_canvas(bool canvas[SIDE][SIDE], int col) {
 	for (int y = 0; y < SIDE; ++y) {
 		for (int x = 0; x < SIDE; ++x) {
 			if (canvas[y][x]) {
-				pset(y, x, col);
+				pset(x, y, col);
 			}
 		}
 	}
@@ -177,7 +183,7 @@ void draw_canvas(bool canvas[SIDE][SIDE], int col) {
 
 int animation_fuse = 2*animation_tick;
 
-void print(int x, int y, char const *str, io::Color color = io::LightGray) {
+void print(int x, int y, char const *str, io::Color color = io::White) {
 	for (int i = 0; str[i] != 0 && x + i < 32; ++i) {
 		io::cset(x + i, y, str[i], color);
 	}
@@ -185,6 +191,11 @@ void print(int x, int y, char const *str, io::Color color = io::LightGray) {
 
 int lastMouseX;
 int lastMouseY;
+
+constexpr int INFO_UI_LINE_Y = 14;
+constexpr int INFO_UI_LINE_X = 18;
+constexpr int FIRST_UI_LINE_Y = 14;
+constexpr int SECOND_UI_LINE_Y = 15;
 
 void onframe() {
 	io::cls();
@@ -220,41 +231,42 @@ void onframe() {
 	}
 	switch (mode) {
 	case Free:
-		print(LEFT_MARGIN+4, 12, "mode: canvas");
+		print(LEFT_MARGIN + 4, FIRST_UI_LINE_Y, "mode: canvas");
 		break;
 	case Demo:
-		print(LEFT_MARGIN+4, 12, "mode: demo");
+		print(LEFT_MARGIN + 4, FIRST_UI_LINE_Y, "mode: demo");
 		break;
 	case Exam:
-		print(LEFT_MARGIN+4, 12, "mode: exam");
+		print(LEFT_MARGIN + 4, FIRST_UI_LINE_Y, "mode: exam");
 		break;
 	}
 	if (mode != Free) {
 		int up = chars[ch].unicode_point;
 		char const *hex = "0123456789abcdef";
-		print(LEFT_MARGIN+4, 13, "char: ");
-		print(LEFT_MARGIN+10, 13, chars[ch].name);
-		print(LEFT_MARGIN+4, 14, "U+", io::DarkGray);
-		io::cset(LEFT_MARGIN+6, 14, hex[up%0x10000/0x1000], io::DarkGray);
-		io::cset(LEFT_MARGIN+7, 14, hex[up%0x1000/0x100], io::DarkGray);
-		io::cset(LEFT_MARGIN+8, 14, hex[up%0x100/0x10], io::DarkGray);
-		io::cset(LEFT_MARGIN+9, 14, hex[up%0x10], io::DarkGray);
+		print(LEFT_MARGIN + 4, SECOND_UI_LINE_Y, "char: ");
+		print(LEFT_MARGIN + 10, SECOND_UI_LINE_Y, chars[ch].name);
+		print(LEFT_MARGIN + INFO_UI_LINE_X + 4, INFO_UI_LINE_Y, "U+", io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 6, INFO_UI_LINE_Y, hex[up%0x10000/0x1000], io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 7, INFO_UI_LINE_Y, hex[up%0x1000/0x100], io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 8, INFO_UI_LINE_Y, hex[up%0x100/0x10], io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 9, INFO_UI_LINE_Y, hex[up%0x10], io::DarkGray);
 	}
 	if (mode == Free) {
-		print(LEFT_MARGIN+4, 13, "xy:", io::DarkGray);
-		io::cset(LEFT_MARGIN+8, 13, '0' + (lastMouseX+1)%10, io::DarkGray);
-		io::cset(LEFT_MARGIN+9, 13, '0' + (lastMouseY+1)%10, io::DarkGray);
+		print(LEFT_MARGIN + INFO_UI_LINE_X + 4, INFO_UI_LINE_Y, "xy:", io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 8, INFO_UI_LINE_Y, '0' + (lastMouseX+1)%10, io::DarkGray);
+		io::cset(LEFT_MARGIN + INFO_UI_LINE_X + 9, INFO_UI_LINE_Y, '0' + (lastMouseY+1)%10, io::DarkGray);
 	}
-	io::cset(LEFT_MARGIN, 12, '<', io::Red);
-	io::cset(LEFT_MARGIN+2, 12, '>', io::Red);
+	io::cset(LEFT_MARGIN, FIRST_UI_LINE_Y, '<', io::Red);
+	io::cset(LEFT_MARGIN + 2, FIRST_UI_LINE_Y, '>', io::Red);
 	if (mode != Free) {
-		io::cset(LEFT_MARGIN, 13, '<', io::Red);
-		io::cset(LEFT_MARGIN+2, 13, '>', io::Red);
+		io::cset(LEFT_MARGIN, SECOND_UI_LINE_Y, '<', io::Red);
+		io::cset(LEFT_MARGIN + 2, SECOND_UI_LINE_Y, '>', io::Red);
 	}
 }
 
 int fromYToCanvasY(int y) {
 	y -= TOP_MARGIN;
+	y /= CELL_HEIGHT;
 	if (0 <= y && y < SIDE) {
 		return y;
 	}
@@ -263,7 +275,7 @@ int fromYToCanvasY(int y) {
 
 int fromXToCanvasX(int x) {
 	x -= LEFT_MARGIN;
-	x /= 2;
+	x /= CELL_WIDTH;
 	if (0 <= x && x < SIDE) {
 		return x;
 	}
@@ -274,19 +286,19 @@ bool mouseDown;
 bool freeModePaintValue;
 void onmouse(int x, int y, io::Mouse m) {
 	if (m == io::MouseDown) {
-		if (x == LEFT_MARGIN) {
-			if (y == 12) {
+		if (LEFT_MARGIN - 2 <= x && x <= LEFT_MARGIN) {
+			if (y == FIRST_UI_LINE_Y) {
 				prevmode();
 			}
-			if (y == 13 && mode != Free) {
+			if (y == SECOND_UI_LINE_Y && mode != Free) {
 				prevch();
 			}
 		}
-		if (x == LEFT_MARGIN+2) {
-			if (y == 12) {
+		if (LEFT_MARGIN + 2 <= x && x <= LEFT_MARGIN + 4) {
+			if (y == FIRST_UI_LINE_Y) {
 				nextmode();
 			}
-			if (y == 13 && mode != Free) {
+			if (y == SECOND_UI_LINE_Y && mode != Free) {
 				nextch();
 			}
 		}
