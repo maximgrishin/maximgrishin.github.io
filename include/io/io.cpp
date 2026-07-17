@@ -157,7 +157,7 @@ void cls() {
 	}
 }
 
-void sfx(int channel, int note, int volume) {
+void sfx(int note, int channel, int volume) {
 	if (note == 0) {
 		vbuf[channel] = 0;
 	} else {

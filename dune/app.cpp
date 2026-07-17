@@ -2,6 +2,9 @@
 
 constexpr int speed = 2;
 
+constexpr io::Channel BassChannel = io::Square;
+constexpr io::Channel MelodyChannel = io::Triangle;
+
 int transpose(int note, int shift) {
 	return note != 0 ? note + shift : 0;
 }
@@ -100,7 +103,7 @@ void melodyB(int tick) {
 		 0, 50, 48,  0, 46,  0, 48,  0,
 	}[step/2];
 	note = transpose(note, shift);
-	io::sfx(2, note, volume);
+	io::sfx(note, MelodyChannel, volume);
 }
 
 void bridge(int tick) {
@@ -123,7 +126,7 @@ void bridge(int tick) {
 		shift += 7;
 	}
 	note = transpose(note, shift);
-	io::sfx(2, note, volume);
+	io::sfx(note, MelodyChannel, volume);
 }
 
 int t;
@@ -132,19 +135,19 @@ void onframe() {
 	++t;
 	t %= 768*speed;
 	if (t < 128*speed) {
-		io::sfx(1, bassA(t), 2);
+		io::sfx(bassA(t), BassChannel, 2);
 		bridge(t);
 	}
 	else if (t < 384*speed) {
-		io::sfx(1, bassA(t-128*speed), 2);
-		io::sfx(2, melodyA(t-128*speed), 2);
+		io::sfx(bassA(t-128*speed), BassChannel, 2);
+		io::sfx(melodyA(t-128*speed), MelodyChannel, 2);
 	}
 	else if (t < 512*speed) {
-		io::sfx(1, bassB(t-384*speed), 2);
+		io::sfx(bassB(t-384*speed), BassChannel, 2);
 		bridge(t-384*speed);
 	}
 	else {
-		io::sfx(1, bassB(t-512*speed), 2);
+		io::sfx(bassB(t-512*speed), BassChannel, 2);
 		melodyB(t-512*speed);
 	}
 	for (int i = 0; i < 16; ++i) {

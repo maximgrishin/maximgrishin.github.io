@@ -212,14 +212,14 @@ void onframe() {
 	}
 	else {
 		if (blink_fuse) {
-			io::sfx(io::Square, (int[]){0,57,54,50,47}[(blink_fuse + animation_tick - 2)/animation_tick], io::Forte);
+			io::sfx((int[]){0,57,54,50,47}[(blink_fuse + animation_tick - 2)/animation_tick]);
 			--blink_fuse;
 			if (blink_fuse == 0) {
 				copy_canvas(stale, fresh);
 			}
 		}
 		if (victory_fuse && !blink_fuse) {
-			io::sfx(io::Square, (int[]){0,74,69,66,62}[(victory_fuse + animation_tick - 2)/animation_tick], io::Forte);
+			io::sfx((int[]){0,74,69,66,62}[(victory_fuse + animation_tick - 2)/animation_tick]);
 			--victory_fuse;
 			if (victory_fuse == 0) {
 				copy_canvas(done, stale);

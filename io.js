@@ -121,9 +121,9 @@ function processInput(callback) {
 }
 
 let audioCtx;
-const types = ["sine", "square", "triangle", "sawtooth"];
+const types = ["square", "triangle"];
 const CHANNELS = types.length;
-const shares = [3/8, 1/8, 3/8, 1/8];
+const shares = [1/4, 3/4];
 const osc = [];
 const gain = [];
 

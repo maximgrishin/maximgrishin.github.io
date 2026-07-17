@@ -22,14 +22,12 @@ enum Color {
 	Colors,
 };
 
-enum {
-	Sine,
+enum Channel {
 	Square,
 	Triangle,
-	Sawtooth,
 };
 
-enum {
+enum Volume {
 	Silent,
 	Piano,
 	Forte,
@@ -43,7 +41,7 @@ enum Mouse {
 
 void cset(int x, int y, int character, int foreground = Colors, int background = Colors);
 void cls();
-void sfx(int channel, int note, int volume);
+void sfx(int note, int channel = Square, int volume = Forte);
 
 void onframe(void (*func)());
 void onchar(void (*func)(int));
