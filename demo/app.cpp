@@ -53,8 +53,8 @@ void onframe() {
 	}
 
 	if (y == 8 && 8 <= x && x <= 10) {
-		io::sfx(60+x-8, io::SquareOne);
-		io::sfx(64+x-8, io::SquareTwo);
+		io::sfx(60+x-8, io::Square);
+		io::sfx(64+x-8, io::Triangle);
 	}
 	io::cls();
 	io::cset(8,8,' ',9,9);
