@@ -97,7 +97,7 @@ void melodyB(int tick) {
 		48, 48, 48, 48, 45, 45, 45, 45,
 		45, 45, 45, 45,  0,  0,  0,  0,
 
-		43, 43, 46,  0, 50, 	0, 50, 53,
+		43, 43, 46,  0, 50,  0, 50, 53,
 		 0, 53, 55,  0, 58,  0, 55,  0,
 		53, 53, 55,  0, 50,  0, 53, 50,
 		 0, 50, 48,  0, 46,  0, 48,  0,
@@ -129,6 +129,94 @@ void bridge(int tick) {
 	io::sfx(note, MelodyChannel, volume);
 }
 
+int cameraX;
+int cameraY = 16;
+
+void mset(int x, int y, int ch, int fg, int bg) {
+	io::cset(2*x - cameraX, y - cameraY, ch, fg, bg);
+	io::cset(2*x+1 - cameraX, y - cameraY, ch, fg, bg);
+}
+
+void sset(int x, int y, int ch, int fg, int bg) {
+	io::cset(x - cameraX, y - cameraY, ch, fg, bg);
+}
+
+constexpr int MAP_WIDTH = 32;
+constexpr int MAP_HEIGHT = 32;
+
+char const* mapConfig = R"(
+44333000000000000111111111111222
+44300000000000000011111111111112
+43030000000000000001111111111111
+33300000000000000001111111111121
+00000000000000000001111111111221
+00000000000000300011111111111111
+00000000000000300001111111111111
+00000000000000340001121111111111
+00000000000000030000122111111111
+00000000000000000001111111111111
+00000000000000000000011000111000
+00000000000000000000000000000000
+00000000000000001110000000003000
+00000000000000011111000000044300
+00000033000000012211000000000030
+00000330000000012111000000000000
+00000000000000001110000000000000
+00000000000000000000000000000000
+00000000000000000000000000000000
+10000000000000000000000000000033
+11011001000000000000000000000334
+11111111101100000033000000000034
+11111111111110000343300000000003
+11111111111110003434433000000003
+11111111111110003433330000000000
+11111111111110000343300000000000
+11111111111110000330000000000000
+11111111111110000000000000000000
+11211111111110000000000000330000
+12211111111110000000000000030000
+11111111111110000000000000000000
+11111111111111000000000000000000
+)";
+
+char map[MAP_HEIGHT][MAP_WIDTH];
+
+void readMap() {
+	int x = 0;
+	int y = -1;
+	char const* mapReader = mapConfig;
+	while (*mapReader != 0) {
+		if (*mapReader == '\n') {
+			++y;
+			x = 0;
+		}
+		else {
+			map[y][x] = *mapReader;
+			++x;
+		}
+		++mapReader;
+	}
+}
+
+void printint(int y, int num) {
+	int x = 31;
+	if (num == 0) {
+		cset(x, y, '0', io::White, io::Black);
+	}
+	bool isNegative = num < 0;
+	if (isNegative) {
+		num = -num;
+	}
+	while (num != 0) {
+		cset(x, y, '0' + (num % 10), io::White, io::Black);
+		num /= 10;
+		--x;
+	}
+	if (isNegative) {
+		cset(x, y, '-', io::White, io::Black);
+	}
+}
+
 int t;
 
 void onframe() {
@@ -150,56 +238,90 @@ void onframe() {
 		io::sfx(bassB(t-512*speed), BassChannel, 2);
 		melodyB(t-512*speed);
 	}
-	for (int i = 0; i < 16; ++i) {
-		for (int j = 0; j < 32; ++j) {
-			io::cset(j, i, ' ', 15, 15);
+
+	for (int i = 0; i < MAP_HEIGHT; ++i) {
+		for (int j = 0; j < MAP_WIDTH; ++j) {
+			int color = (int[]){15,4,5,10,9}[map[i][j] - '0'];
+			mset(j, i, ' ', color, color);
 		}
 	}
-	for (int i = 5; i < 16; ++i) {
-		for (int j = 0; j < 26; ++j) {
-			io::cset(j, i, ' ', 4, 4);
+
+	for (int i = 24; i < 26; ++i) {
+		for (int j = 6; j < 8; ++j) {
+			mset(j, i, ' ', 12, 1);
 		}
 	}
-	for (int j = 0; j < 32; ++j) {
-		io::cset(j, 4 + j/19, ' ', 4, (bool[]){
-			1,1,1,1,0,0,1,1,
-			1,1,1,0,0,0,1,1,
-			1,0,0,0,0,1,1,1,
-			0,0,0,0,0,0,0,0,
-		}[j] ? 4 : 15);
-	}
-	io::cset(26,2,' ',7,9);
-	io::cset(27,2,' ',7,9);
-	io::cset(28,2,' ',7,9);
-	io::cset(29,2,' ',7,10);
-	io::cset(29,1,'7',7,9);
-	io::cset(30,1,'9',7,15);
-	io::cset(28,1,' ',7,10);
-	io::cset(30,3,' ',7,10);
-	for (int i = 7; i < 10; ++i) {
-		for (int j = 10; j < 16; ++j) {
-			io::cset(j, i, ' ', 12, 1);
+	for (int i = 24; i < 26; ++i) {
+		for (int j = 8; j < 10; ++j) {
+			mset(j, i, ' ', 12, 6);
 		}
 	}
-	for (int i = 7; i < 10; ++i) {
-		for (int j = 16; j < 22; ++j) {
-			io::cset(j, i, ' ', 12, 6);
+	for (int i = 2; i < 4; ++i) {
+		for (int j = 23; j < 25; ++j) {
+			mset(j, i, ' ', 12, 13);
+		}
+	}
+	for (int i = 2; i < 4; ++i) {
+		for (int j = 25; j < 27; ++j) {
+			mset(j, i, ' ', 12, 1);
+		}
+	}
+	for (int i = 4; i < 6; ++i) {
+		for (int j = 24; j < 27; ++j) {
+			mset(j, i, ' ', 12, 6);
 		}
 	}
 	char spin = (int[]){'-','\\','|','/'}[t / 8 % 4];
-	io::cset(10,9,spin,12,1);
-	io::cset(16,9,spin,12,6);
-	io::cset(4,12,' ',5,5);
-	io::cset(5,12,' ',5,5);
-	io::cset(4,13,' ',5,5);
-	io::cset(5,13,' ',5,5);
-	io::cset(3,13,' ',5,5);
-	io::cset(2,13,' ',5,5);
-	io::cset(0,3,' ',4,4);
-	io::cset(26,15,' ',4,4);
-	io::cset(27,15,' ',4,4);
+	sset(12,25,spin,12,1);
+	sset(16,25,spin,12,6);
+	sset(46,3,spin,8,13);
+	sset(50,3,spin,8,1);
+	sset(48,5,spin,8,6);
+	io::cset(28,1,'8',7);
+	io::cset(29,1,'3',7);
+	io::cset(30,1,'2',7);
+	//printint(14, cameraX);
+	//printint(15, cameraY);
+}
+
+int dragStartX;
+int dragStartY;
+int lastMouseX;
+int lastMouseY;
+bool isMouseDown;
+
+void clamp(int* val, int lo, int hi) {
+	if (*val < lo) {
+		*val = lo;
+	}
+	if (*val > hi) {
+		*val = hi;
+	}
+}
+
+void onmouse(int x, int y, io::Mouse m) {
+	if (m == io::MouseDown) {
+		dragStartX = x;
+		dragStartY = y;
+		isMouseDown = true;
+	}
+	if (m == io::MouseUp) {
+		isMouseDown = false;
+	}
+	if (isMouseDown && m == io::MouseMove) {
+		const int dragShiftX = lastMouseX - x;
+		const int dragShiftY = lastMouseY - y;
+		cameraX += dragShiftX;
+		cameraY += dragShiftY;
+		clamp(&cameraX, 0, 32);
+		clamp(&cameraY, 0, 16);
+	}
+	lastMouseX = x;
+	lastMouseY = y;
 }
 
 void init() {
+	readMap();
 	io::onframe(onframe);
+	io::onmouse(onmouse);
 }
