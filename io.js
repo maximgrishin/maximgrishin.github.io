@@ -221,12 +221,16 @@ WebAssembly.instantiateStreaming(fetch("./compiled.wasm"), importObject).then((o
 		});
 		document.body.addEventListener("touchstart", (event) => {
 			event.preventDefault();
-			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
-			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
+			if (event.touches.length == 1) {
+				handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+				handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 1, mouseCallback);
+			}
 		}, {passive: false});
 		document.body.addEventListener("touchmove", (event) => {
 			event.preventDefault();
-			handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+			if (event.touches.length == 1) {
+				handleMouse(event.changedTouches[0].pageX, event.changedTouches[0].pageY, 2, mouseCallback);
+			}
 		}, {passive: false});
 		document.body.addEventListener("touchend", (event) => {
 			event.preventDefault();
