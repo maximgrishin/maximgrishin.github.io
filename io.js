@@ -175,6 +175,9 @@ let lastY = 0;
 function handleMouse(pageX, pageY, type, callback) {
 	const element = document.elementFromPoint(pageX, pageY);
 	if (element.x == undefined) {
+		if (type == 3) {
+			callback(lastX, lastY, type);
+		}
 		return;
 	}
 	const x = element.x;
